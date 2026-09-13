@@ -1,4 +1,4 @@
-import { withSupabase } from "npm:@supabase/server";
+import { withSupabase } from "@supabase/server";
 
 const json = (body: unknown, status = 200) =>
   Response.json(body, { status });
