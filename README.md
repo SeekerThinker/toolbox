@@ -28,9 +28,9 @@ Toolbox 不追求工具数量，也不收录“偶尔用一次就结束”的一
 
 ## 相关独立项目
 
-Toolbox 也可以作为其他独立开源项目的入口，但这些项目不会计入上面的核心工具数量。
+相关项目可以被链接，但不计入 Toolbox 的核心工具，也不嵌入主仓库：
 
-- **[Word 结构化写作模板集](https://github.com/SeekerThinker/word-writing-templates)**：面向 Windows / macOS 的书籍与文章 Word 模板；无需排版背景知识。普通用户可以直接使用 **[在线模板选择向导](https://seekerthinker.github.io/toolbox/word-writing-templates/)**。
+- **[Word 结构化写作模板集](https://github.com/SeekerThinker/word-writing-templates)**：Windows / macOS 的书籍与文章 Word 模板。
 
 ## 使用体验
 
@@ -49,12 +49,11 @@ Toolbox 使用统一的 `toolbox:data:v1` 本地数据结构保存偏好、收�
 ## 技术结构
 
 ```text
-index.html                    # Toolbox 页面结构
-styles.css                    # Toolbox 样式
-core.js                       # 工具注册、搜索、收藏、主题、统一存储
-tools-focus.js                # 番茄钟、深度工作
-tools-thinking.js             # 拆解、决策、复盘、学习等思维工具
-word-writing-templates/       # 独立项目的模板选择向导页面
+index.html          # 页面结构
+styles.css          # 全部样式
+core.js             # 工具注册、搜索、收藏、主题、统一存储
+tools-focus.js      # 番茄钟、深度工作
+tools-thinking.js   # 拆解、决策、复盘、学习等思维工具
 ```
 
 技术栈：**HTML + CSS + Vanilla JavaScript**。无框架、无 npm 依赖、无构建流程。
@@ -73,7 +72,6 @@ python3 -m http.server 8080
 node --check core.js
 node --check tools-focus.js
 node --check tools-thinking.js
-node --check word-writing-templates/app.js
 node tests/smoke.mjs
 ```
 
