@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Toolbox：从待办出发，把思考、专注和历史记录连接在一起。" />
+  <meta name="description" content="Toolbox：从一件待办出发，把澄清、思考、专注、复盘和历史记录连接起来。" />
   <meta name="theme-color" content="#f5f6f8" />
   <title>Toolbox</title>
   <link rel="stylesheet" href="./styles.css" />
@@ -37,24 +37,27 @@
         <div id="taskList" class="task-list"></div>
       </section>
 
-      <section class="method-section" aria-label="方法工具">
-        <div class="section-heading method-heading">
-          <h2 id="sectionTitle">方法工具</h2>
-          <span id="resultCount" class="result-count"></span>
-        </div>
-        <div class="tool-finder">
-          <div class="search-wrap">
-            <span aria-hidden="true">⌕</span>
-            <input id="searchInput" type="search" placeholder="搜索任务拆解、决策、复盘、番茄钟…" autocomplete="off" />
-            <kbd>/</kbd>
+      <details class="method-section">
+        <summary class="method-summary"><strong>方法库</strong><span>展开</span></summary>
+        <div class="method-body">
+          <div class="section-heading method-heading" aria-hidden="true">
+            <h2 id="sectionTitle">方法工具</h2>
+            <span id="resultCount" class="result-count"></span>
           </div>
-          <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
+          <div class="tool-finder">
+            <div class="search-wrap">
+              <span aria-hidden="true">⌕</span>
+              <input id="searchInput" type="search" placeholder="搜索任务拆解、决策、复盘、番茄钟…" autocomplete="off" />
+              <kbd>/</kbd>
+            </div>
+            <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
+          </div>
+          <div id="toolGrid" class="tool-grid"></div>
+          <div id="emptyState" class="empty-state" hidden>
+            <div>⌕</div><h3>没有找到匹配的工具</h3><p>换个关键词，或切回“全部”。</p>
+          </div>
         </div>
-        <div id="toolGrid" class="tool-grid"></div>
-        <div id="emptyState" class="empty-state" hidden>
-          <div>⌕</div><h3>没有找到匹配的工具</h3><p>换个关键词，或切回“全部”。</p>
-        </div>
-      </section>
+      </details>
     </main>
 
     <footer>
