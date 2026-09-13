@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Toolbox：一个打开即用的效率与思维工具箱。处理 PDF、图片、文本和数据，也提供专注、任务拆解、决策与复盘工具。" />
+  <meta name="description" content="Toolbox：PDF、图片、文本、数据、计算、专注与思维工具。" />
   <meta name="theme-color" content="#f5f6fa" />
-  <title>Toolbox · 效率与思维工具箱</title>
+  <title>Toolbox</title>
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./compact.css" />
 </head>
@@ -25,21 +25,12 @@
     </header>
 
     <main>
-      <section class="hero compact-hero">
-        <div class="hero-heading-row">
-          <div>
-            <h1>效率与思维工具箱</h1>
-            <p class="hero-copy">PDF、图片、文本、计算、数据、专注与思维工具。无需注册，本地优先。</p>
-          </div>
-          <span id="heroToolCount" class="tool-count-badge">— 个工具</span>
-        </div>
-
+      <section class="tool-finder" aria-label="查找工具">
         <div class="search-wrap compact-search">
           <span aria-hidden="true">⌕</span>
           <input id="searchInput" type="search" placeholder="搜索 PDF、OCR、日期、番茄钟、决策、JSON…" autocomplete="off" />
           <kbd>/</kbd>
         </div>
-
         <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
       </section>
 
@@ -47,6 +38,7 @@
         <div class="section-heading compact-heading">
           <h2 id="sectionTitle">全部工具</h2>
           <span id="resultCount" class="result-count"></span>
+          <span id="heroToolCount" hidden></span>
         </div>
 
         <div id="toolGrid" class="tool-grid"></div>
@@ -59,7 +51,7 @@
     </main>
 
     <footer class="compact-footer">
-      <span>Toolbox · Local-first</span>
+      <span>Local-first</span>
       <a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a>
     </footer>
   </div>
