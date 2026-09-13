@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Toolbox：从一件待办出发，把澄清、思考、专注、复盘和历史记录连接起来。" />
+  <meta name="description" content="Toolbox：从一件待办出发，把任务、专注、思考、计划、目标与长期元认知连接起来。" />
   <meta name="theme-color" content="#f5f6f8" />
   <title>Toolbox</title>
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./horizons.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -20,6 +21,12 @@
         <div class="task-section-head"><div><h2>待办</h2><span id="taskCount" class="result-count"></span></div><div class="task-filters"><button id="taskFilterOpen" class="mini-btn active" type="button">待办</button><button id="taskFilterMatrix" class="mini-btn" type="button">四象限</button><button id="taskFilterDone" class="mini-btn" type="button">已完成</button></div></div>
         <div id="taskList" class="task-list"></div>
       </section>
+
+      <details class="horizon-section">
+        <summary><strong>计划、目标与洞察</strong><span>按需展开</span></summary>
+        <div id="horizonMount" class="horizon-mount"></div>
+      </details>
+
       <details class="method-section">
         <summary class="method-summary"><strong>方法库</strong><span>按需展开</span></summary>
         <div class="method-body">
@@ -33,6 +40,6 @@
     <footer><span>Local-first</span><a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a></footer>
   </div>
   <dialog id="toolDialog"><div class="dialog-shell"><div class="dialog-head"><div><span id="dialogIcon" class="tool-icon"></span><div><div class="dialog-title-row"><h2 id="dialogTitle"></h2><span id="dialogLocalBadge" class="local-badge">本地处理</span></div><p id="dialogDesc"></p></div></div><button id="closeDialogBtn" class="icon-btn" type="button" aria-label="关闭">×</button></div><div id="toolMount" class="tool-mount"></div></div></dialog>
-  <script defer src="./core.js"></script><script defer src="./tools-focus.js"></script><script defer src="./tools-thinking.js"></script><script defer src="./tasks.js"></script>
+  <script defer src="./core.js"></script><script defer src="./tools-focus.js"></script><script defer src="./tools-thinking.js"></script><script defer src="./tasks.js"></script><script defer src="./horizons.js"></script>
 </body>
 </html>
