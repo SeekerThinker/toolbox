@@ -15,6 +15,7 @@ jobs:
           node --check core.js
           node --check cloud-config.js
           node --check sync.js
+          node --check account-lifecycle.js
           node --check tools-focus.js
           node --check tools-thinking.js
           node --check tasks.js
