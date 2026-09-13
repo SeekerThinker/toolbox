@@ -26,35 +26,48 @@ Toolbox 不追求工具数量，也不收录“偶尔用一次就结束”的一
 | **思维** | Brain Dump、任务拆解、艾森豪威尔矩阵、加权决策矩阵、5 Whys、事前风险推演、每日 / 每周复盘、费曼学习卡 |
 | **专注** | 番茄钟、深度工作计时 |
 
-## 相关独立项目
+## 长期使用能力
 
-相关项目保持独立仓库，不计入 Toolbox 的核心工具数量；Toolbox 可以提供轻量入口或辅助页面。
+Toolbox 不只生成一次性的结果，也开始保存真正值得回看的个人记录：
 
-- **[Word 结构化写作模板集](https://github.com/SeekerThinker/word-writing-templates)**：Windows / macOS 的书籍与文章 Word 模板。普通用户可直接打开 **[在线模板选择向导](https://seekerthinker.github.io/toolbox/word-writing-templates/)**，回答三个问题后下载合适模板。
+- **番茄钟**：记录真正完成的专注段，并统计今日 / 近 7 天完成数量；
+- **深度工作**：保存每次任务、备注和时长，显示今日与近 7 天投入、次数和平均时长；
+- **加权决策矩阵**：保存决策主题、方案、权重、评分和当时的最高方案，可重新载入；
+- **每日 / 每周复盘**：保存完整复盘记录，可重新载入继续查看；
+- **数据备份**：从页脚导出全部本地数据为 JSON，也可在另一台设备导入恢复。
+
+这些记录统一保存在 `toolbox:data:v1` 中，为以后可选账号和跨设备同步保留同一套数据结构。
 
 ## 使用体验
 
 - `/` 快捷键聚焦搜索
-- 分类筛选、收藏、最近使用
+- 思维 / 专注分类、收藏、最近使用
 - 深色模式与响应式布局
 - 无账号也可以完整使用
 - 数据优先保存在当前浏览器
+- 支持完整数据导出 / 导入
 
 ## 数据与 Local-first
 
-Toolbox 使用统一的 `toolbox:data:v1` 本地数据结构保存偏好、收藏、最近使用以及部分专注 / 思维工具状态。旧版 `deskkit:*` 数据会自动迁移。
+Toolbox 使用统一的 `toolbox:data:v1` 本地数据结构保存偏好、收藏、最近使用、专注历史、复盘历史和决策记录。旧版 `deskkit:*` 数据会自动迁移。
 
-统一数据层已经为后续的数据导入 / 导出和可选云同步留出接口。未来即使加入账号，也应保持：**不登录可以完整使用，登录只用于同步、迁移和备份。**
+未来即使加入账号，也应保持：**不登录可以完整使用，登录只用于同步、迁移和备份。**
+
+## 相关独立项目
+
+与 Toolbox 不属于同一产品方向的项目保持独立维护，不计入核心工具数量。
+
+- **[Word 结构化写作模板集](https://github.com/SeekerThinker/word-writing-templates)**：Windows / macOS 的书籍与文章 Word 模板。
 
 ## 技术结构
 
 ```text
-index.html                    # Toolbox 页面结构
-styles.css                    # Toolbox 样式
-core.js                       # 工具注册、搜索、收藏、主题、统一存储
-tools-focus.js                # 番茄钟、深度工作
-tools-thinking.js             # 拆解、决策、复盘、学习等思维工具
-word-writing-templates/       # 独立 Word 模板项目的在线选择向导
+index.html         # 页面结构
+styles.css         # 全部样式
+core.js            # 工具注册、搜索、收藏、主题、统一存储、数据备份
+tools-focus.js     # 番茄钟、深度工作与专注趋势
+tools-thinking.js  # 拆解、决策、复盘、学习等思维工具
+tests/smoke.mjs    # 核心结构与长期数据能力检查
 ```
 
 技术栈：**HTML + CSS + Vanilla JavaScript**。无框架、无 npm 依赖、无构建流程。
@@ -73,7 +86,6 @@ python3 -m http.server 8080
 node --check core.js
 node --check tools-focus.js
 node --check tools-thinking.js
-node --check word-writing-templates/app.js
 node tests/smoke.mjs
 ```
 
@@ -81,14 +93,13 @@ GitHub Actions 会在 push 和 pull request 时自动执行这些检查。
 
 ## Roadmap
 
-当前优先级不是增加更多工具，而是增强长期使用价值：
+当前优先级仍然是增加长期使用价值，而不是增加工具数量：
 
-- 数据导入 / 导出 UI
 - 可选账号与跨设备同步
-- 专注历史与趋势
-- 复盘历史与检索
-- 个人模板与常用结构
-- 决策记录与回看
+- 历史记录搜索、筛选与归档
+- 个人模板与常用工作方法复用
+- 决策结果回看：当时为什么这样选，后来结果如何
+- 复盘趋势与周期性问题识别
 - PWA / 离线安装
 
 ## License
