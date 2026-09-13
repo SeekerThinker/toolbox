@@ -3,10 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="DeskKit 是一个不登录、打开即用的日常效率与思维工具箱：处理 PDF、图片、文本、数据，也帮助你专注、拆解任务、做决策与复盘。" />
+  <meta name="description" content="DeskKit：一个打开即用的效率与思维工具箱。处理 PDF、图片、文本和数据，也帮助你专注、拆解任务、做决策与复盘。" />
   <meta name="theme-color" content="#f5f6fa" />
-  <title>DeskKit · 日常效率与思维工具箱</title>
+  <title>DeskKit · 效率与思维工具箱</title>
   <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./compact.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -19,104 +20,38 @@
         </span>
       </a>
 
-      <nav class="top-nav" aria-label="主导航">
-        <a href="#tool-library">工具库</a>
-        <a href="#principles">为什么 DeskKit</a>
-      </nav>
-
       <div class="top-actions">
-        <button id="recentBtn" class="ghost-btn" type="button">↻ 最近使用</button>
+        <button id="recentBtn" class="ghost-btn" type="button">↻ 最近</button>
         <button id="favoritesBtn" class="ghost-btn" type="button">★ 收藏</button>
         <button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button>
       </div>
     </header>
 
     <main>
-      <section class="hero">
-        <div class="hero-main">
-          <p class="eyebrow">PERSONAL WORKBENCH · LOCAL-FIRST</p>
-          <h1>处理琐事，<br><span>也整理思路。</span></h1>
-          <p class="hero-copy">DeskKit 把那些“一次只浪费几分钟、一天却会遇到很多次”的小问题收进同一个工作台：处理文件和文字，完成计算和转换，也帮你专注、拆解任务、做决策和复盘。</p>
+      <section class="hero compact-hero">
+        <p class="eyebrow">DESKKIT · LOCAL-FIRST</p>
+        <h1>需要什么，直接用。</h1>
+        <p class="hero-copy">文件、文字、计算、数据、专注与思考工具，都放在一个轻量工作台里。</p>
 
-          <div class="hero-actions">
-            <a class="primary-link" href="#tool-library">开始使用 <span>↓</span></a>
-            <a class="secondary-link" href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">查看源码 ↗</a>
-          </div>
-
-          <div class="trust-row" aria-label="产品特点">
-            <span>无需注册</span>
-            <span>本地优先</span>
-            <span>免费开源</span>
-            <span id="heroToolCount">— 个工具</span>
-          </div>
+        <div class="search-wrap compact-search">
+          <span aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" placeholder="搜索 PDF、OCR、日期、番茄钟、决策、JSON…" autocomplete="off" />
+          <kbd>/</kbd>
         </div>
 
-        <aside class="hero-panel" aria-label="DeskKit 能做什么">
-          <div class="hero-panel-head">
-            <span>一个工作台，四类问题</span>
-            <strong>从执行到思考</strong>
-          </div>
-          <div class="capability-list">
-            <div class="capability-item">
-              <span class="capability-icon">01</span>
-              <div><strong>处理材料</strong><small>PDF、图片、二维码、OCR</small></div>
-            </div>
-            <div class="capability-item">
-              <span class="capability-icon">02</span>
-              <div><strong>整理信息</strong><small>文本、CSV、JSON、Diff、脱敏</small></div>
-            </div>
-            <div class="capability-item">
-              <span class="capability-icon">03</span>
-              <div><strong>推进工作</strong><small>日期、计算、写作、专注计时</small></div>
-            </div>
-            <div class="capability-item">
-              <span class="capability-icon">04</span>
-              <div><strong>澄清思路</strong><small>拆解、决策、复盘、根因分析</small></div>
-            </div>
-          </div>
-        </aside>
-      </section>
+        <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
 
-      <section class="finder" aria-label="搜索工具">
-        <div class="finder-copy">
-          <p class="eyebrow">FIND A TOOL</p>
-          <h2>你现在想解决什么？</h2>
-          <p>输入任务、文件格式或问题类型。也可以按分类浏览。</p>
-        </div>
-        <div class="finder-controls">
-          <div class="search-wrap">
-            <span aria-hidden="true">⌕</span>
-            <input id="searchInput" type="search" placeholder="搜索：PDF、压缩、日期、番茄钟、决策、JSON…" autocomplete="off" />
-            <kbd>/</kbd>
-          </div>
-          <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
+        <div class="trust-row compact-meta" aria-label="产品特点">
+          <span>无需注册</span>
+          <span>本地优先</span>
+          <span id="heroToolCount">— 个工具</span>
         </div>
       </section>
 
-      <section id="principles" class="principles" aria-label="DeskKit 设计原则">
-        <article>
-          <span class="principle-num">01</span>
-          <h3>打开就用</h3>
-          <p>不把简单问题包装成复杂工作流。能在一个页面里完成，就不多走一步。</p>
-        </article>
-        <article>
-          <span class="principle-num">02</span>
-          <h3>本地优先</h3>
-          <p>文本、表格、图片和 PDF 尽量在浏览器内处理，减少不必要的数据上传。</p>
-        </article>
-        <article>
-          <span class="principle-num">03</span>
-          <h3>不只处理文件</h3>
-          <p>效率也来自更清晰的注意力、优先级和判断，因此把思维工具和实用工具放在一起。</p>
-        </article>
-      </section>
-
-      <section id="tool-library" class="workspace">
-        <div class="section-heading">
+      <section id="tool-library" class="workspace compact-workspace">
+        <div class="section-heading compact-heading">
           <div>
-            <p class="eyebrow">TOOL LIBRARY</p>
             <h2 id="sectionTitle">全部工具</h2>
-            <p class="section-subtitle">常用工具优先，尽量少配置、少跳转、少打扰。</p>
           </div>
           <span id="resultCount" class="result-count"></span>
         </div>
@@ -130,15 +65,9 @@
       </section>
     </main>
 
-    <footer>
-      <div>
-        <strong>DeskKit</strong>
-        <span>一个随手打开、几秒钟解决问题的个人工作台。</span>
-      </div>
-      <div class="footer-meta">
-        <span>开源 · Local-first · 无账号</span>
-        <a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a>
-      </div>
+    <footer class="compact-footer">
+      <span>DeskKit · 打开即用的个人工作台</span>
+      <a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a>
     </footer>
   </div>
 
