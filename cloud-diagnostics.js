@@ -3,7 +3,10 @@
 
   const SDK_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm";
   const config = window.ToolboxCloudConfig || {};
-  const configured = config.provider === "supabase" && /^https:\/\//.test(config.url || "") && /^sb_publishable_/.test(config.publishableKey || "");
+  const urlReady = config.provider === "supabase" && /^https:\/\//.test(config.url || "");
+  const keyReady = /^sb_publishable_/.test(config.publishableKey || "");
+  const configured = urlReady && keyReady;
+  const runtimeKeyStorage = config.runtimeKeyStorage || "toolbox:supabase:publishable-key";
   let clientPromise = null;
 
   const getClient = async () => {
@@ -24,11 +27,38 @@
 
   const row = (name, state, detail) => `<div class="cloud-check ${state}"><strong>${name}</strong><span>${detail}</span></div>`;
 
+  const renderBootstrap = mount => {
+    if (!urlReady || keyReady) return;
+    mount.insertAdjacentHTML("beforeend", `<div class="cloud-key-setup">
+      <label class="field"><span class="help-text">Supabase Publishable Key</span><input class="text-input" data-cloud-key-input type="password" autocomplete="off" placeholder="sb_publishable_…"></label>
+      <div class="toolbar"><button class="primary-btn" data-save-cloud-key type="button">保存并重新加载</button></div>
+      <span class="help-text">这里只接受浏览器公开的 <code>sb_publishable_…</code>。不要粘贴 <code>sb_secret_…</code>、service_role 或数据库密码。这个值只保存在当前浏览器。</span>
+    </div>`);
+    const input = mount.querySelector("[data-cloud-key-input]");
+    const button = mount.querySelector("[data-save-cloud-key]");
+    button.onclick = () => {
+      const value = String(input.value || "").trim();
+      if (!/^sb_publishable_[A-Za-z0-9_-]+$/.test(value)) {
+        if (window.Toolbox?.toast) Toolbox.toast("请输入 sb_publishable_ 开头的 Publishable Key");
+        return;
+      }
+      try {
+        localStorage.setItem(runtimeKeyStorage, value);
+        if (window.Toolbox?.toast) Toolbox.toast("连接配置已保存，正在重新加载");
+        setTimeout(() => location.reload(), 250);
+      } catch {
+        if (window.Toolbox?.toast) Toolbox.toast("当前浏览器无法保存本地连接配置");
+      }
+    };
+  };
+
   const runChecks = async mount => {
     const rows = [];
-    rows.push(row("浏览器配置", configured ? "ok" : "bad", configured ? "Project URL 与 publishable key 已配置" : "尚未配置"));
+    rows.push(row("Project URL", urlReady ? "ok" : "bad", urlReady ? "已指向 Toolbox 的 Supabase 项目" : "尚未配置"));
+    rows.push(row("Publishable Key", keyReady ? "ok" : "bad", keyReady ? "当前浏览器已配置" : "尚未配置；登录同步暂不可用"));
     if (!configured) {
       mount.innerHTML = rows.join("");
+      renderBootstrap(mount);
       return;
     }
 
