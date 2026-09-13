@@ -13,7 +13,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check core.js
-          node --check tools-practical.js
+          node --check tools-pdf.js
           node --check tools-focus.js
           node --check tools-thinking.js
           node --check tools-external.js
