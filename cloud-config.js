@@ -2,7 +2,7 @@
   "use strict";
   window.ToolboxCloudConfig = Object.freeze({
     provider: "supabase",
-    url: "",
+    url: "https://bmclrtrtzntzrhudwisv.supabase.co",
     publishableKey: "",
     oauthProviders: ["github", "google"]
   });
