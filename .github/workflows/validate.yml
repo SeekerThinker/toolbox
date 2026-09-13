@@ -23,3 +23,9 @@ jobs:
           node --check calibration.js
       - name: Run smoke checks
         run: node tests/smoke.mjs
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check Edge Functions
+        run: deno check --config supabase/functions/delete-account/deno.json supabase/functions/delete-account/index.ts
