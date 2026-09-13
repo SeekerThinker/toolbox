@@ -3,21 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="DeskKit：一个打开即用的效率与思维工具箱。处理 PDF、图片、文本和数据，也帮助你专注、拆解任务、做决策与复盘。" />
+  <meta name="description" content="Toolbox：一个打开即用的效率与思维工具箱。处理 PDF、图片、文本和数据，也提供专注、任务拆解、决策与复盘工具。" />
   <meta name="theme-color" content="#f5f6fa" />
-  <title>DeskKit · 效率与思维工具箱</title>
+  <title>Toolbox · 效率与思维工具箱</title>
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./compact.css" />
 </head>
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="#" aria-label="DeskKit 首页">
-        <span class="brand-mark">D</span>
-        <span class="brand-copy">
-          <strong>DeskKit</strong>
-          <small>效率与思维工具箱</small>
-        </span>
+      <a class="brand" href="#" aria-label="Toolbox 首页">
+        <span class="brand-mark">T</span>
+        <span class="brand-copy"><strong>Toolbox</strong></span>
       </a>
 
       <div class="top-actions">
@@ -29,9 +26,13 @@
 
     <main>
       <section class="hero compact-hero">
-        <p class="eyebrow">DESKKIT · LOCAL-FIRST</p>
-        <h1>需要什么，直接用。</h1>
-        <p class="hero-copy">文件、文字、计算、数据、专注与思考工具，都放在一个轻量工作台里。</p>
+        <div class="hero-heading-row">
+          <div>
+            <h1>效率与思维工具箱</h1>
+            <p class="hero-copy">PDF、图片、文本、计算、数据、专注与思维工具。无需注册，本地优先。</p>
+          </div>
+          <span id="heroToolCount" class="tool-count-badge">— 个工具</span>
+        </div>
 
         <div class="search-wrap compact-search">
           <span aria-hidden="true">⌕</span>
@@ -40,19 +41,11 @@
         </div>
 
         <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
-
-        <div class="trust-row compact-meta" aria-label="产品特点">
-          <span>无需注册</span>
-          <span>本地优先</span>
-          <span id="heroToolCount">— 个工具</span>
-        </div>
       </section>
 
       <section id="tool-library" class="workspace compact-workspace">
         <div class="section-heading compact-heading">
-          <div>
-            <h2 id="sectionTitle">全部工具</h2>
-          </div>
+          <h2 id="sectionTitle">全部工具</h2>
           <span id="resultCount" class="result-count"></span>
         </div>
 
@@ -66,7 +59,7 @@
     </main>
 
     <footer class="compact-footer">
-      <span>DeskKit · 打开即用的个人工作台</span>
+      <span>Toolbox · Local-first</span>
       <a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a>
     </footer>
   </div>
