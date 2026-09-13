@@ -16,8 +16,12 @@ const calibration=fs.readFileSync("calibration.js","utf8");
 const sync=fs.readFileSync("sync.js","utf8");
 const lifecycle=fs.readFileSync("account-lifecycle.js","utf8");
 const cloudConfig=fs.readFileSync("cloud-config.js","utf8");
-const schema=fs.readFileSync("supabase/schema.sql","utf8");
+const migrationPath="supabase/migrations/20260913103000_create_toolbox_sync.sql";
+const migration=fs.readFileSync(migrationPath,"utf8");
+const supabaseConfig=fs.readFileSync("supabase/config.toml","utf8");
 const deleteAccount=fs.readFileSync("supabase/functions/delete-account/index.ts","utf8");
+const deleteAccountDeno=fs.readFileSync("supabase/functions/delete-account/deno.json","utf8");
+const gitignore=fs.readFileSync(".gitignore","utf8");
 const ids=[...source.matchAll(/registerTool\(\{\s*id:\s*"([^"]+)"/g)].map(m=>m[1]);
 
 if(ids.length!==8)throw new Error(`expected 8 methods, found ${ids.length}`);
@@ -60,13 +64,18 @@ for(const token of ["flowType: \"pkce\"","toolbox:data-changed","lastSyncedHash"
   if(!sync.includes(token))throw new Error(`sync layer missing token: ${token}`);
 }
 if(!sync.includes("登录前不会上传")||!sync.includes("enabled:false"))throw new Error("cloud upload must require explicit opt-in");
-if(!fs.existsSync("supabase/schema.sql"))throw new Error("cloud schema is missing");
-if(!/enable row level security/i.test(schema)||!schema.includes("auth.uid()")||!/security invoker/i.test(schema))throw new Error("cloud schema must enforce authenticated per-user RLS");
-if(!schema.includes("expected_revision")||!schema.includes("sync_conflict"))throw new Error("cloud writes need optimistic concurrency protection");
+
+if(fs.existsSync("supabase/schema.sql"))throw new Error("database schema must live in versioned migrations, not a second schema.sql source");
+if(!fs.existsSync(migrationPath))throw new Error("cloud migration is missing");
+if(!/enable row level security/i.test(migration)||!migration.includes("auth.uid()")||!/security invoker/i.test(migration))throw new Error("cloud migration must enforce authenticated per-user RLS");
+if(!migration.includes("expected_revision")||!migration.includes("sync_conflict"))throw new Error("cloud writes need optimistic concurrency protection");
+if(!migration.includes("on delete cascade"))throw new Error("deleting an auth user should cascade to synced Toolbox data");
+if(!supabaseConfig.includes('project_id = "toolbox"')||!supabaseConfig.includes("additional_redirect_urls")||!supabaseConfig.includes("[functions.delete-account]")||!supabaseConfig.includes("verify_jwt = true"))throw new Error("Supabase CLI config is incomplete");
 
 if(!lifecycle.includes("delete-account")||!lifecycle.includes("删除账号及云端数据")||!lifecycle.includes("当前浏览器里的本地数据会保留"))throw new Error("account deletion lifecycle is incomplete");
-if(!deleteAccount.includes("SUPABASE_SECRET_KEYS")||!deleteAccount.includes("auth.getUser(token)")||!deleteAccount.includes("auth.admin.deleteUser(user.id)"))throw new Error("account deletion must verify the caller and delete through server-side admin credentials");
-if(deleteAccount.includes("sb_secret_"))throw new Error("server secret must never be hard-coded in the repository");
-if(!schema.includes("on delete cascade"))throw new Error("deleting an auth user should cascade to synced Toolbox data");
+if(!deleteAccount.includes('withSupabase({ auth: "user" }')||!deleteAccount.includes("ctx.supabaseAdmin.auth.admin.deleteUser")||!deleteAccount.includes("ctx.userClaims"))throw new Error("account deletion must use authenticated server-side Supabase context");
+if(/SUPABASE_SECRET_KEYS|sb_secret_|service_role/.test(deleteAccount))throw new Error("server credentials should be provided by Supabase context, not handled in function source");
+if(!deleteAccountDeno.includes('"@supabase/server": "npm:@supabase/server"'))throw new Error("Edge Function dependency map is missing");
+if(!gitignore.includes("supabase/functions/.env")||!gitignore.includes("supabase/.temp/"))throw new Error("local Supabase secrets/state must be ignored");
 
-console.log(`ok: ${ids.length} methods, optional local-first system, calibration, opt-in sync and account deletion enabled`);
+console.log(`ok: ${ids.length} methods, optional local-first system, calibration, opt-in sync, migrations and account deletion enabled`);
