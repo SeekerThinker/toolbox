@@ -46,21 +46,13 @@ Toolbox 的核心是一件具体要做的事，但**不规定用户必须经过�
 
 年月周日不是四套待办列表，而是 **Focus Horizons（时间视野）**。
 
-每个周期只按需记录：
+每个周期只按需记录这个周期最重要的方向 / 结果、计划提醒，以及周期结束后的回顾 / 调整。任务仍然只有一份，系统自动读取该周期真实完成的任务、专注时间和目标打卡。
 
-- 这个周期最重要的方向 / 结果；
-- 计划或提醒；
-- 周期结束后的回顾 / 调整。
-
-任务仍然只有一份。系统会自动读取该周期真实产生的数据，包括完成任务数、专注时间、目标打卡和实际完成的任务。
-
-长期校准层可以把这些真实事实一键写入日 / 周 / 月 / 年回顾，用户只需要继续补充自己的判断和下一轮调整。
+长期校准层可以把这些事实一键写入日 / 周 / 月 / 年回顾，用户只需要继续补充自己的判断和下一轮调整。
 
 ## 目标与打卡
 
-目标是任务之上的可选对象。
-
-可以创建长期目标、今日打卡、关联已有任务、查看关联任务完成情况和实际专注投入，也可以可选设置“每周目标次数”，例如运动 3 次 / 周。没有目标也不会影响任务、番茄钟或任何思维方法。
+目标是任务之上的可选对象。可以创建长期目标、今日打卡、关联已有任务、查看关联任务完成情况和实际专注投入，也可以可选设置“每周目标次数”，例如运动 3 次 / 周。没有目标也不会影响任务、番茄钟或任何思维方法。
 
 ## 长期元认知与校准
 
@@ -74,14 +66,7 @@ Toolbox 不把“洞察”做成生产力评分，而是把长期记录变成一
 
 ## 任务详情
 
-打开任务后，默认只强调最直接的操作：
-
-- 开始番茄钟；
-- 开始深度工作；
-- 标记完成；
-- 删除。
-
-其他能力按需展开：任务信息、深入思考、完成后复盘和历史。元认知提示只是建议层，不会阻止用户继续执行。
+打开任务后，默认只强调最直接的操作：开始番茄钟、开始深度工作、标记完成和删除。其他能力按需展开：任务信息、深入思考、完成后复盘和历史。元认知提示只是建议层，不会阻止用户继续执行。
 
 ## 捕获与优先级
 
@@ -117,9 +102,11 @@ Brain Dump 已吸收到捕获层，艾森豪威尔矩阵已吸收到任务视图
 - 用户可以只删除云端同步数据，也可以永久删除登录身份及云端数据；
 - 两种删除操作都不会删除当前浏览器里的本地工作台。
 
-浏览器端采用 Supabase OAuth + PKCE，并只使用 publishable key。数据库通过 Row Level Security 将每个用户限制在自己的 `user_id`。永久删除账号通过 `supabase/functions/delete-account` Edge Function 完成，管理员 secret key 不进入前端源码。
+浏览器端采用 Supabase OAuth + PKCE，并只使用 publishable key。数据库通过 Row Level Security 将每个用户限制在自己的 `user_id`。永久删除账号通过 `supabase/functions/delete-account` Edge Function 完成，管理员权限只存在于服务端 Supabase 上下文。
 
-部署步骤见 [`supabase/README.md`](./supabase/README.md)，数据库结构见 [`supabase/schema.sql`](./supabase/schema.sql)。
+后端现在使用标准 Supabase CLI 项目结构，数据库变更以 `supabase/migrations/` 为唯一真相来源，可以通过 `supabase db reset` 本地重建，再通过 `supabase db push` 部署到已连接的远端项目。
+
+完整部署步骤见 [`supabase/README.md`](./supabase/README.md)。
 
 > 当前公开站点的 `cloud-config.js` 仍为空配置，所以账号面板只会提示“云同步尚未配置”；这不是把本地备份冒充成已上线的云同步。
 
@@ -139,20 +126,28 @@ horizons.js                             # 年月周日计划、目标打卡、�
 calibration.js                          # 估时、障碍、专注模式、周期事实、目标节奏与决策回看
 tools-focus.js                          # taskId / nextAction 关联的番茄钟与深度工作
 tools-thinking.js                       # 拆解、Decision Journal、原因探索、风险、复盘、学习
-supabase/schema.sql                     # 每用户云数据、RLS 与乐观并发函数
+supabase/config.toml                    # 可复现的本地 Supabase 配置
+supabase/migrations/                    # 数据库迁移、RLS 与并发控制
 supabase/functions/delete-account/      # 服务端永久删除身份与云端数据
 tests/smoke.mjs                         # 核心产品模型检查
 ```
 
-技术栈：**HTML + CSS + Vanilla JavaScript**。无框架、无 npm 依赖、无构建流程。Supabase JS 只在云同步真正配置并需要登录 / 同步时按需加载。
+主前端仍是 **HTML + CSS + Vanilla JavaScript**，无 npm 构建流程。Supabase JS 只在云同步真正配置并需要登录 / 同步时按需加载；Supabase 后端使用 CLI 管理迁移和 Edge Functions。
 
 ## 本地运行
+
+仅运行 Toolbox 前端：
 
 ```bash
 python3 -m http.server 8080
 ```
 
-然后访问 `http://localhost:8080/`。
+需要同时验证云端结构时：
+
+```bash
+supabase start
+supabase db reset
+```
 
 ## 静态检查
 
@@ -173,7 +168,7 @@ GitHub Actions 会在 push 和 pull request 时执行这些检查。
 
 ## 下一阶段
 
-1. 创建并配置实际 Supabase 项目，使公开站点的 OAuth / 同步真正上线；
+1. 创建并连接实际 Supabase 项目，使公开站点的 OAuth / 同步真正上线；
 2. 让目标、任务和周期方向之间的关联更无感；
 3. 随样本积累，增加更稳健的估时、延期和判断校准趋势；
 4. 将计划开始时间与 Google / Outlook / Apple Calendar 等日历打通；
