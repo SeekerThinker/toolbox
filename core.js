@@ -3,9 +3,8 @@
 
   const STORAGE_KEY = "toolbox:data:v1";
   const DATA_VERSION = 1;
-  const CATEGORY_ORDER = ["文件", "图片", "文本", "计算", "日期时间", "数据", "写作", "开发", "隐私", "思维", "专注"];
+  const CATEGORY_ORDER = ["思维", "专注"];
   const tools = new Map();
-  const scriptCache = new Map();
 
   const safeParse = (value, fallback) => {
     try { return value == null ? fallback : JSON.parse(value); }
@@ -76,9 +75,7 @@
   if (!data || typeof data !== "object" || Array.isArray(data)) data = defaultData();
   data = { ...defaultData(), ...data, preferences: { ...defaultData().preferences, ...(data.preferences || {}) }, tools: data.tools || {} };
   data.version = DATA_VERSION;
-  if (migrateLegacy(data) || !localStorage.getItem(STORAGE_KEY)) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  }
+  if (migrateLegacy(data) || !localStorage.getItem(STORAGE_KEY)) localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 
   const storage = {
     get(path, fallback = null) {
@@ -103,21 +100,21 @@
     importData(text) {
       const incoming = typeof text === "string" ? JSON.parse(text) : text;
       if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) throw new Error("数据格式无效");
-      const next = {
+      data = {
         ...defaultData(),
         ...incoming,
         version: DATA_VERSION,
         preferences: { ...defaultData().preferences, ...(incoming.preferences || {}) },
-        tools: incoming.tools || {}
+        favorites: Array.isArray(incoming.favorites) ? incoming.favorites : [],
+        recent: Array.isArray(incoming.recent) ? incoming.recent : [],
+        tools: incoming.tools && typeof incoming.tools === "object" ? incoming.tools : {}
       };
-      data = next;
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       return storage.snapshot();
     }
   };
 
   const $ = (selector, root = document) => root.querySelector(selector);
-  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const escapeHtml = (value = "") => String(value).replace(/[&<>"']/g, c => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
   }[c]));
@@ -132,7 +129,7 @@
     }
     el.textContent = text;
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.remove(), 1500);
+    toastTimer = setTimeout(() => el.remove(), 1600);
   };
 
   const copyText = async text => {
@@ -167,44 +164,6 @@
     setTimeout(() => URL.revokeObjectURL(url), 1200);
   };
 
-  const formatBytes = bytes => {
-    if (!bytes) return "0 B";
-    const units = ["B", "KB", "MB", "GB", "TB"];
-    let value = bytes;
-    let index = 0;
-    while (value >= 1024 && index < units.length - 1) { value /= 1024; index++; }
-    return `${value.toFixed(index ? 1 : 0)} ${units[index]}`;
-  };
-
-  const loadScript = (src, test) => {
-    if (test?.()) return Promise.resolve();
-    if (scriptCache.has(src)) return scriptCache.get(src);
-    const promise = new Promise((resolve, reject) => {
-      const s = document.createElement("script");
-      s.src = src;
-      s.async = true;
-      s.onload = resolve;
-      s.onerror = () => reject(new Error("外部组件加载失败"));
-      document.head.appendChild(s);
-    });
-    scriptCache.set(src, promise);
-    return promise;
-  };
-
-  const button = (label, action, cls = "secondary-btn") => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = cls;
-    b.textContent = label;
-    b.addEventListener("click", action);
-    return b;
-  };
-
-  const baseEditor = (root, placeholder = "粘贴或输入文本…") => {
-    root.innerHTML = `<div class="editor-stack"><textarea class="input-area" placeholder="${escapeHtml(placeholder)}" spellcheck="false"></textarea><div class="toolbar"></div><div class="output-panel"></div></div>`;
-    return { input: $(".input-area", root), toolbar: $(".toolbar", root), output: $(".output-panel", root) };
-  };
-
   const registerTool = (meta, renderer) => {
     if (!meta?.id || typeof renderer !== "function") throw new Error("工具注册信息不完整");
     if (tools.has(meta.id)) throw new Error(`工具 ID 重复：${meta.id}`);
@@ -216,9 +175,8 @@
   let ui;
 
   const orderedTools = () => {
-    const list = [...tools.values()];
     const order = new Map(CATEGORY_ORDER.map((x, i) => [x, i]));
-    return list.sort((a, b) => (order.get(a.category) ?? 99) - (order.get(b.category) ?? 99));
+    return [...tools.values()].sort((a, b) => (order.get(a.category) ?? 99) - (order.get(b.category) ?? 99));
   };
 
   const categories = () => {
@@ -229,9 +187,7 @@
   const filteredTools = () => {
     const query = state.query.trim().toLowerCase();
     let source = orderedTools();
-    if (state.category === "最近") {
-      source = state.recent.map(id => tools.get(id)).filter(Boolean);
-    }
+    if (state.category === "最近") source = state.recent.map(id => tools.get(id)).filter(Boolean);
     return source.filter(tool => {
       const categoryOk = state.category === "全部" || state.category === "最近" ||
         (state.category === "收藏" ? state.favorites.has(tool.id) : tool.category === state.category);
@@ -276,19 +232,54 @@
     document.title = "Toolbox";
   };
 
+  const prepareDialog = ({ icon, title, desc, local = true }) => {
+    cleanupActiveTool();
+    ui.dialogIcon.textContent = icon;
+    ui.dialogTitle.textContent = title;
+    ui.dialogDesc.textContent = desc;
+    ui.localBadge.hidden = !local;
+    ui.mount.innerHTML = "";
+  };
+
   const openTool = id => {
     const tool = tools.get(id);
     if (!tool) return;
-    cleanupActiveTool();
     state.recent = [id, ...state.recent.filter(x => x !== id)].slice(0, 8);
     storage.set("recent", state.recent);
-    ui.dialogIcon.textContent = tool.icon;
-    ui.dialogTitle.textContent = tool.name;
-    ui.dialogDesc.textContent = tool.desc;
-    ui.localBadge.hidden = !tool.local;
-    ui.mount.innerHTML = "";
+    prepareDialog({ icon: tool.icon, title: tool.name, desc: tool.desc, local: tool.local });
     const cleanup = tool.renderer(ui.mount);
     activeCleanup = typeof cleanup === "function" ? cleanup : null;
+    ui.dialog.showModal();
+  };
+
+  const openDataPanel = () => {
+    prepareDialog({ icon: "↥", title: "数据备份", desc: "导出或恢复当前浏览器里的偏好、历史记录和工具数据。" });
+    ui.mount.innerHTML = `<div class="editor-stack">
+      <div class="output-panel">数据默认只保存在当前浏览器。导出 JSON 可用于备份或迁移到另一台设备。</div>
+      <div class="toolbar"><button id="exportDataBtn" class="primary-btn" type="button">导出全部数据</button></div>
+      <hr class="divider">
+      <div class="field"><label>恢复备份</label><input id="importDataFile" class="file-drop" type="file" accept="application/json,.json"></div>
+      <button id="importDataBtn" class="secondary-btn" type="button">导入并覆盖当前数据</button>
+      <div id="dataBackupStatus" class="output-panel">导入后页面会重新载入。</div>
+    </div>`;
+    $("#exportDataBtn", ui.mount).onclick = () => {
+      const body = storage.exportData();
+      const date = new Date().toISOString().slice(0, 10);
+      download(new Blob([body], { type: "application/json;charset=utf-8" }), `toolbox-backup-${date}.json`);
+      toast("备份已导出");
+    };
+    $("#importDataBtn", ui.mount).onclick = async () => {
+      const file = $("#importDataFile", ui.mount).files[0];
+      const status = $("#dataBackupStatus", ui.mount);
+      if (!file) { status.textContent = "请先选择备份 JSON。"; return; }
+      try {
+        storage.importData(await file.text());
+        status.textContent = "✓ 已恢复备份，正在重新载入。";
+        setTimeout(() => location.reload(), 350);
+      } catch (error) {
+        status.textContent = `导入失败：${error.message}`;
+      }
+    };
     ui.dialog.showModal();
   };
 
@@ -302,12 +293,15 @@
       mount: $("#toolMount"), empty: $("#emptyState"), sectionTitle: $("#sectionTitle"), resultCount: $("#resultCount"),
       dialogIcon: $("#dialogIcon"), dialogTitle: $("#dialogTitle"), dialogDesc: $("#dialogDesc"), localBadge: $("#dialogLocalBadge")
     };
-    state = {
-      category: "全部",
-      query: "",
-      favorites: new Set(storage.get("favorites", [])),
-      recent: storage.get("recent", [])
-    };
+
+    const savedFavorites = storage.get("favorites", []);
+    const savedRecent = storage.get("recent", []);
+    const validFavorites = Array.isArray(savedFavorites) ? savedFavorites.filter(id => tools.has(id)) : [];
+    const validRecent = Array.isArray(savedRecent) ? savedRecent.filter(id => tools.has(id)).slice(0, 8) : [];
+    if (JSON.stringify(validFavorites) !== JSON.stringify(savedFavorites)) storage.set("favorites", validFavorites);
+    if (JSON.stringify(validRecent) !== JSON.stringify(savedRecent)) storage.set("recent", validRecent);
+
+    state = { category: "全部", query: "", favorites: new Set(validFavorites), recent: validRecent };
 
     const savedTheme = storage.get("preferences.theme", null);
     if (savedTheme === "dark" || savedTheme === "light") document.documentElement.dataset.theme = savedTheme;
@@ -335,8 +329,9 @@
       if (event.key === "Escape" && ui.dialog.open) closeDialog();
     });
 
-    $("#recentBtn")?.addEventListener("click", () => { state.category = "最近"; render(); $(".workspace")?.scrollIntoView({block:"start"}); });
-    $("#favoritesBtn")?.addEventListener("click", () => { state.category = "收藏"; render(); $(".workspace")?.scrollIntoView({block:"start"}); });
+    $("#recentBtn")?.addEventListener("click", () => { state.category = "最近"; render(); $(".workspace")?.scrollIntoView({ block: "start" }); });
+    $("#favoritesBtn")?.addEventListener("click", () => { state.category = "收藏"; render(); $(".workspace")?.scrollIntoView({ block: "start" }); });
+    $("#dataBtn")?.addEventListener("click", event => { event.preventDefault(); openDataPanel(); });
     $("#themeBtn")?.addEventListener("click", () => {
       const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
       document.documentElement.dataset.theme = next;
@@ -349,19 +344,6 @@
     render();
   };
 
-  window.Toolbox = {
-    registerTool,
-    storage,
-    $, $$,
-    escapeHtml,
-    copyText,
-    toast,
-    download,
-    formatBytes,
-    loadScript,
-    button,
-    baseEditor
-  };
-
+  window.Toolbox = { registerTool, storage, $, escapeHtml, copyText, toast, download };
   document.addEventListener("DOMContentLoaded", start, { once: true });
 })();
