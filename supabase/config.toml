@@ -1,0 +1,13 @@
+project_id = "toolbox"
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:8080"
+additional_redirect_urls = [
+  "http://127.0.0.1:8080/**",
+  "http://localhost:8080/**",
+  "https://seekerthinker.github.io/toolbox/**"
+]
+
+[functions.delete-account]
+verify_jwt = true
