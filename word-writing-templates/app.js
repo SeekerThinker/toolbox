@@ -43,7 +43,7 @@
       <section class="hero">
         <p class="eyebrow">不用懂 Word 排版，也不用懂 GitHub</p>
         <h1>回答 3 个问题，直接拿到适合你的模板</h1>
-        <p class="hero-copy">选择写作类型、章节编号和电脑系统。最后只给你一个最合适的下载按钮。模板是 <code>.dotx</code> 格式，双击后 Word 会自动新建文档。</p>
+        <p class="hero-copy">选择写作类型、章节编号和电脑系统。最后先给你最简单的“直接开始版”；需要前言、摘要、目录或参考文献时，也可以一键下载“带常用结构版”。</p>
         <div class="hero-badges"><span>✓ Windows / macOS</span><span>✓ 双击即用</span><span>✓ 自动编号</span><span>✓ 无需宏</span></div>
       </section>
 
@@ -72,8 +72,8 @@
         <section class="result" id="result" hidden aria-live="polite">
           <div class="result-copy">
             <p class="eyebrow">已经选好了</p><h2 id="resultTitle"></h2><p id="resultExample" class="number-example"></p><p id="resultDesc"></p>
-            <div class="result-actions"><a id="singleDownload" class="btn primary" href="#">下载这个模板</a><a id="packageDownload" class="btn secondary" href="#">下载本系统全部 6 个模板</a></div>
-            <p class="help-text">下载后双击 <code>.dotx</code> 文件即可。Word 会创建新文档，不会把模板本身改坏。</p>
+            <div class="result-actions"><a id="singleDownload" class="btn primary" href="#">下载直接开始版</a><a id="structuredDownload" class="btn secondary" href="#">下载带常用结构版</a><a id="packageDownload" class="btn secondary" href="#">下载本系统全部模板</a></div>
+            <p class="help-text">不确定就选第一个“直接开始版”：打开后只有标题、一级标题和正文。结构版只是额外预置可删除的常见区块。</p>
             <button id="restartBtn" class="text-btn" type="button">重新选择</button>
           </div>
           <div class="result-preview"><img id="resultImage" alt="所选 Word 模板的排版预览"></div>
@@ -82,6 +82,7 @@
 
       <section class="faq"><h2>第一次用 Word 模板？</h2>
         <details><summary>下载后怎么开始？</summary><p>双击下载的 <code>.dotx</code> 文件。Word 会自动创建一份新的文档，你只需要把占位文字换成自己的内容。</p></details>
+        <details><summary>“直接开始版”和“带常用结构版”有什么区别？</summary><p>直接开始版只有标题、一级标题和正文，最适合马上开写。书籍结构版会多放前言、自动目录、附录和参考文献；文章结构版会多放摘要、关键词和参考文献。不需要的区块都可以直接删除。</p></details>
         <details><summary>我不会快捷键，可以用吗？</summary><p>可以。快捷键只是加速功能；你也可以直接使用 Word 顶部“样式”区域选择一级标题、二级标题和正文。</p></details>
         <details><summary>Windows 写到一半，可以拿到 MacBook 继续吗？</summary><p>可以。文档里的标题结构、编号和正文样式会保留。两个平台分别提供模板，主要是为了让初次创建文档时的字体和快捷键更自然。</p></details>
       </section>
@@ -172,14 +173,17 @@
     if (!opt || !state.os) return;
     const osLabel = state.os === "windows" ? "Windows" : "macOS";
     const typeLabel = state.type === "book" ? "书籍" : "文章";
+    const structuredFile = opt.file.replace(/\.dotx$/, "-常用结构.dotx");
     $("#resultTitle").textContent = `${typeLabel}｜${opt.name}｜${osLabel}`;
     $("#resultExample").textContent = opt.example;
     $("#resultDesc").textContent = opt.desc;
     $("#resultImage").src = `${PREVIEW}/${opt.id}.png`;
     $("#singleDownload").href = `${RAW}/${state.os}/${opt.folder}/${encodeURIComponent(opt.file)}`;
-    $("#singleDownload").textContent = `下载这个 ${osLabel} 模板`;
+    $("#singleDownload").textContent = `下载 ${osLabel} 直接开始版`;
+    $("#structuredDownload").href = `${RAW}/${state.os}/structured/${opt.folder}/${encodeURIComponent(structuredFile)}`;
+    $("#structuredDownload").textContent = `下载 ${osLabel} 带常用结构版`;
     $("#packageDownload").href = PACKAGE[state.os];
-    $("#packageDownload").textContent = `下载 ${osLabel} 全部 6 个模板`;
+    $("#packageDownload").textContent = `下载 ${osLabel} 全部模板`;
     $("#result").hidden = false;
   }
 
