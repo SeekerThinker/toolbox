@@ -1,4 +1,4 @@
-const CACHE_NAME = "toolbox-shell-v1";
+const CACHE_NAME = "toolbox-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -18,7 +18,8 @@ const APP_SHELL = [
   "./tasks.js",
   "./horizons.js",
   "./calibration.js",
-  "./pwa.js"
+  "./pwa.js",
+  "./capture.js"
 ];
 
 self.addEventListener("install", event => {
