@@ -13,27 +13,13 @@ const unique = new Set(ids);
 if (ids.length !== 10) throw new Error(`expected 10 tools, found ${ids.length}`);
 if (unique.size !== ids.length) throw new Error("duplicate tool ids");
 if (/DeskKit/.test(source) || /DeskKit/.test(index)) throw new Error("legacy brand remains in active source");
-for (const removed of ["tools-pdf.js","tools-external.js","tools-practical.js","tools-basic.js","tools-utility.js","tools-media.js","compact.css"]) {
-  if (index.includes(removed)) throw new Error(`removed module is still loaded: ${removed}`);
+if (!index.includes('id="dataBtn"')) throw new Error("data backup entry is missing");
+if (!source.includes("tools.review.history")) throw new Error("review history is missing");
+if (!source.includes("tools.decision.history")) throw new Error("decision history is missing");
+if (!source.includes("近 7 天")) throw new Error("focus trend summary is missing");
+
+for (const removed of ["tools-pdf.js","tools-external.js","tools-practical.js","tools-basic.js","tools-utility.js","tools-media.js","compact.css","word-writing-templates/"]) {
+  if (index.includes(removed)) throw new Error(`removed module or route is still loaded: ${removed}`);
 }
 
-const wizardFiles = [
-  "word-writing-templates/index.html",
-  "word-writing-templates/styles.css",
-  "word-writing-templates/app.js"
-];
-for (const file of wizardFiles) {
-  if (!fs.existsSync(file)) throw new Error(`missing wizard file: ${file}`);
-}
-const wizardIndex = fs.readFileSync(wizardFiles[0], "utf8");
-const wizardApp = fs.readFileSync(wizardFiles[2], "utf8");
-if (!wizardIndex.includes("./app.js") || !wizardIndex.includes("./styles.css")) throw new Error("wizard assets are not linked");
-if (!index.includes("./word-writing-templates/")) throw new Error("Toolbox does not index the Word template wizard");
-for (const id of ["book-cn-traditional","book-chapter-decimal","book-pure-decimal","article-cn-academic","article-decimal","article-cn-compact"]) {
-  if (!wizardApp.includes(id)) throw new Error(`wizard missing template option: ${id}`);
-}
-for (const name of ["Word-Writing-Templates-Windows.zip","Word-Writing-Templates-macOS.zip"]) {
-  if (!wizardApp.includes(name)) throw new Error(`wizard missing stable download: ${name}`);
-}
-
-console.log(`ok: ${ids.length} tools, ${files.length} core scripts, Word template wizard present`);
+console.log(`ok: ${ids.length} long-term tools, ${files.length} scripts, history and backup enabled`);
