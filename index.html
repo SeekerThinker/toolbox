@@ -4,10 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Toolbox：PDF、图片、文本、数据、计算、专注与思维工具。" />
-  <meta name="theme-color" content="#f5f6fa" />
+  <meta name="theme-color" content="#f5f6f8" />
   <title>Toolbox</title>
   <link rel="stylesheet" href="./styles.css" />
-  <link rel="stylesheet" href="./compact.css" />
 </head>
 <body>
   <div class="app-shell">
@@ -16,7 +15,6 @@
         <span class="brand-mark">T</span>
         <span class="brand-copy"><strong>Toolbox</strong></span>
       </a>
-
       <div class="top-actions">
         <button id="recentBtn" class="ghost-btn" type="button">↻ 最近</button>
         <button id="favoritesBtn" class="ghost-btn" type="button">★ 收藏</button>
@@ -26,7 +24,7 @@
 
     <main>
       <section class="tool-finder" aria-label="查找工具">
-        <div class="search-wrap compact-search">
+        <div class="search-wrap">
           <span aria-hidden="true">⌕</span>
           <input id="searchInput" type="search" placeholder="搜索 PDF、OCR、日期、番茄钟、决策、JSON…" autocomplete="off" />
           <kbd>/</kbd>
@@ -34,23 +32,21 @@
         <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
       </section>
 
-      <section id="tool-library" class="workspace compact-workspace">
-        <div class="section-heading compact-heading">
+      <section class="workspace">
+        <div class="section-heading">
           <h2 id="sectionTitle">全部工具</h2>
           <span id="resultCount" class="result-count"></span>
-          <span id="heroToolCount" hidden></span>
         </div>
-
         <div id="toolGrid" class="tool-grid"></div>
         <div id="emptyState" class="empty-state" hidden>
           <div>⌕</div>
           <h3>没有找到匹配的工具</h3>
-          <p>换个关键词试试，或者切回“全部”。</p>
+          <p>换个关键词，或切回“全部”。</p>
         </div>
       </section>
     </main>
 
-    <footer class="compact-footer">
+    <footer>
       <span>Local-first</span>
       <a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a>
     </footer>
@@ -72,13 +68,11 @@
     </div>
   </dialog>
 
-  <script src="./app.js"></script>
-  <script src="./v2-core.js"></script>
-  <script src="./v2-media.js"></script>
-  <script src="./v2-fixes.js"></script>
-  <script src="./v3-register.js"></script>
-  <script src="./v3-focus.js"></script>
-  <script src="./v3-thinking-a.js"></script>
-  <script src="./v3-thinking-b.js"></script>
+  <script defer src="./core.js"></script>
+  <script defer src="./tools-basic.js"></script>
+  <script defer src="./tools-utility.js"></script>
+  <script defer src="./tools-media.js"></script>
+  <script defer src="./tools-focus.js"></script>
+  <script defer src="./tools-thinking.js"></script>
 </body>
 </html>
