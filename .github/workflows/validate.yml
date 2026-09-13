@@ -15,5 +15,6 @@ jobs:
           node --check core.js
           node --check tools-focus.js
           node --check tools-thinking.js
+          node --check word-writing-templates/app.js
       - name: Run smoke checks
         run: node tests/smoke.mjs
