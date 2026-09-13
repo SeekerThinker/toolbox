@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="一个轻量、无后端、隐私友好的日常办公与写作工具集。" />
+  <meta name="theme-color" content="#f6f7fb" />
+  <title>DeskKit · 办公写作工具箱</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="DeskKit 首页">
+        <span class="brand-mark">D</span>
+        <span>
+          <strong>DeskKit</strong>
+          <small>办公写作工具箱</small>
+        </span>
+      </a>
+      <div class="top-actions">
+        <button id="favoritesBtn" class="ghost-btn" type="button">★ 我的收藏</button>
+        <button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <p class="eyebrow">LOCAL-FIRST · NO LOGIN · NO UPLOAD</p>
+        <h1>把零碎的小工具，<br />收进一个干净的工作台。</h1>
+        <p class="hero-copy">文本处理、写作检查、格式整理和开发小工具。所有处理默认在浏览器本地完成，不上传你的内容。</p>
+
+        <div class="search-wrap">
+          <span aria-hidden="true">⌕</span>
+          <input id="searchInput" type="search" placeholder="搜索工具，例如：字数、Markdown、JSON…" autocomplete="off" />
+          <kbd>/</kbd>
+        </div>
+
+        <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
+      </section>
+
+      <section class="workspace">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">TOOL LIBRARY</p>
+            <h2 id="sectionTitle">全部工具</h2>
+          </div>
+          <span id="resultCount" class="result-count"></span>
+        </div>
+
+        <div id="toolGrid" class="tool-grid"></div>
+        <div id="emptyState" class="empty-state" hidden>
+          <div>⌕</div>
+          <h3>没有找到匹配的工具</h3>
+          <p>换个关键词试试，或者切回“全部”。</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>DeskKit · 纯前端工具集</span>
+      <span>数据默认仅停留在你的浏览器里</span>
+    </footer>
+  </div>
+
+  <dialog id="toolDialog">
+    <div class="dialog-shell">
+      <div class="dialog-head">
+        <div>
+          <span id="dialogIcon" class="tool-icon"></span>
+          <div>
+            <h2 id="dialogTitle"></h2>
+            <p id="dialogDesc"></p>
+          </div>
+        </div>
+        <button id="closeDialogBtn" class="icon-btn" type="button" aria-label="关闭">×</button>
+      </div>
+      <div id="toolMount" class="tool-mount"></div>
+    </div>
+  </dialog>
+
+  <template id="textAreaTemplate">
+    <div class="editor-stack">
+      <textarea class="input-area" spellcheck="false"></textarea>
+      <div class="toolbar"></div>
+      <div class="output-panel"></div>
+    </div>
+  </template>
+
+  <script src="./app.js"></script>
+</body>
+</html>
