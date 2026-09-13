@@ -6,7 +6,7 @@
 
 ## 工具
 
-目前共 **31 个工具**。
+目前共 **32 个工具**。
 
 | 分类 | 工具 |
 | --- | --- |
@@ -16,11 +16,13 @@
 | **计算** | 百分比 / 涨跌幅 / 折扣、单位转换 |
 | **日期时间** | 日期间隔 / 工作日 / N 天后日期、Unix 时间戳 |
 | **数据** | CSV / TSV 清洗与转 JSON、行处理器 |
-| **写作** | 字数统计、Markdown 预览、会议议程生成器 |
+| **写作** | 字数统计、Markdown 预览、会议议程生成器、Word 写作模板 |
 | **开发** | JSON 格式化、URL 编解码、Base64 编解码 |
 | **隐私** | 敏感信息打码、密码 / UUID / 随机字符串 |
 | **思维** | Brain Dump、任务拆解、艾森豪威尔矩阵、加权决策矩阵、5 Whys、事前风险推演、每日 / 每周复盘、费曼学习卡 |
 | **专注** | 番茄钟、深度工作计时 |
+
+其中 **Word 写作模板** 是独立维护的开源项目，Toolbox 提供索引入口：<https://github.com/SeekerThinker/word-writing-templates>。
 
 ## 使用体验
 
@@ -57,7 +59,8 @@ core.js             # 工具注册、搜索、收藏、主题、统一存储
 ├─ tools-utility.js # 计算、日期、数据、隐私工具
 ├─ tools-media.js   # PDF、图片、OCR、二维码
 ├─ tools-focus.js   # 番茄钟、深度工作
-└─ tools-thinking.js# 拆解、决策、复盘等思维工具
+├─ tools-thinking.js# 拆解、决策、复盘等思维工具
+└─ tools-external.js# 独立开源项目索引入口
 ```
 
 技术栈：**HTML + CSS + Vanilla JavaScript**。无框架、无 npm 依赖、无构建流程。
@@ -79,6 +82,7 @@ node --check tools-utility.js
 node --check tools-media.js
 node --check tools-focus.js
 node --check tools-thinking.js
+node --check tools-external.js
 node tests/smoke.mjs
 ```
 
