@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const files=["core.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
+const files=["core.js","cloud-config.js","sync.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
 const index=fs.readFileSync("index.html","utf8");
 for(const file of files){
   if(!fs.existsSync(file))throw new Error(`missing ${file}`);
@@ -13,6 +13,9 @@ const thinking=fs.readFileSync("tools-thinking.js","utf8");
 const focus=fs.readFileSync("tools-focus.js","utf8");
 const horizons=fs.readFileSync("horizons.js","utf8");
 const calibration=fs.readFileSync("calibration.js","utf8");
+const sync=fs.readFileSync("sync.js","utf8");
+const cloudConfig=fs.readFileSync("cloud-config.js","utf8");
+const schema=fs.readFileSync("supabase/schema.sql","utf8");
 const ids=[...source.matchAll(/registerTool\(\{\s*id:\s*"([^"]+)"/g)].map(m=>m[1]);
 
 if(ids.length!==8)throw new Error(`expected 8 methods, found ${ids.length}`);
@@ -22,6 +25,7 @@ if(/DeskKit/.test(source)||/DeskKit/.test(index))throw new Error("legacy brand r
 if(index.includes("word-writing-templates"))throw new Error("obsolete word template module leaked back into the core product");
 if(!index.includes('<textarea id="taskInput"')||!index.includes('id="taskFilterMatrix"'))throw new Error("native capture or matrix view is missing");
 if(!index.includes('id="horizonMount"')||!index.includes('id="calibrationMount"'))throw new Error("planning or calibration layer is missing");
+if(!index.includes('id="accountBtn"'))throw new Error("optional account entry is missing");
 if(!index.includes('<details class="method-section">'))throw new Error("method library should remain secondary");
 
 for(const field of ["outcome","nextAction","estimateMinutes","plannedAt","obstacle","ifThen","priority","reflection"]){
@@ -49,4 +53,13 @@ if(!calibration.includes("不等于已经找到根因")||!calibration.includes("
 if(!calibration.includes("把事实写入回顾")||!calibration.includes("我的调整"))throw new Error("plan → actual → adjustment loop is incomplete");
 if(!calibration.includes("当时置信度 ≥70%")||!calibration.includes("保存回看"))throw new Error("decision calibration loop is incomplete");
 
-console.log(`ok: ${ids.length} methods, optional task system, focus horizons, goals and long-term calibration loops enabled`);
+if(!cloudConfig.includes("publishableKey")||!cloudConfig.includes("oauthProviders"))throw new Error("cloud config should expose only browser configuration");
+for(const token of ["flowType: \"pkce\"","toolbox:data-changed","lastSyncedHash","lastSyncedRevision","SYNC_CONFLICT","开始同步","本机和云端"]){
+  if(!sync.includes(token))throw new Error(`sync layer missing token: ${token}`);
+}
+if(!sync.includes("登录前不会上传")||!sync.includes("enabled:false"))throw new Error("cloud upload must require explicit opt-in");
+if(!fs.existsSync("supabase/schema.sql"))throw new Error("cloud schema is missing");
+if(!/enable row level security/i.test(schema)||!schema.includes("auth.uid()")||!/security invoker/i.test(schema))throw new Error("cloud schema must enforce authenticated per-user RLS");
+if(!schema.includes("expected_revision")||!schema.includes("sync_conflict"))throw new Error("cloud writes need optimistic concurrency protection");
+
+console.log(`ok: ${ids.length} methods, optional local-first system, long-term calibration and opt-in cloud sync enabled`);
