@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="一个轻量、无后端、隐私友好的日常办公与写作工具集。" />
+  <meta name="description" content="DeskKit：不登录、不上传、打开即用的日常效率工具箱。PDF、图片、文本、计算、数据与开发工具尽量在浏览器本地完成。" />
   <meta name="theme-color" content="#f6f7fb" />
-  <title>DeskKit · 办公写作工具箱</title>
+  <title>DeskKit · 日常效率工具箱</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
@@ -15,10 +15,11 @@
         <span class="brand-mark">D</span>
         <span>
           <strong>DeskKit</strong>
-          <small>办公写作工具箱</small>
+          <small>日常效率工具箱</small>
         </span>
       </a>
       <div class="top-actions">
+        <button id="recentBtn" class="ghost-btn" type="button">↻ 最近使用</button>
         <button id="favoritesBtn" class="ghost-btn" type="button">★ 我的收藏</button>
         <button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button>
       </div>
@@ -26,13 +27,20 @@
 
     <main>
       <section class="hero">
-        <p class="eyebrow">LOCAL-FIRST · NO LOGIN · NO UPLOAD</p>
-        <h1>把零碎的小工具，<br />收进一个干净的工作台。</h1>
-        <p class="hero-copy">文本处理、写作检查、格式整理和开发小工具。所有处理默认在浏览器本地完成，不上传你的内容。</p>
+        <p class="eyebrow">LOCAL-FIRST · NO LOGIN · OPEN AND USE</p>
+        <h1>少开几个网站，<br />少浪费几分钟。</h1>
+        <p class="hero-copy">PDF、图片、文本、日期、计算和数据处理，都收进一个干净的工作台。文件与文字尽量只在你的浏览器里处理，不主动上传。</p>
+
+        <div class="trust-row" aria-label="产品特点">
+          <span>✓ 不用注册</span>
+          <span>✓ 本地优先</span>
+          <span>✓ 免费开源</span>
+          <span id="heroToolCount">— 个工具</span>
+        </div>
 
         <div class="search-wrap">
           <span aria-hidden="true">⌕</span>
-          <input id="searchInput" type="search" placeholder="搜索工具，例如：字数、Markdown、JSON…" autocomplete="off" />
+          <input id="searchInput" type="search" placeholder="搜索：PDF、压缩、日期、百分比、二维码、JSON…" autocomplete="off" />
           <kbd>/</kbd>
         </div>
 
@@ -58,8 +66,8 @@
     </main>
 
     <footer>
-      <span>DeskKit · 纯前端工具集</span>
-      <span>数据默认仅停留在你的浏览器里</span>
+      <span>DeskKit · 开源日常效率工具箱</span>
+      <span>敏感内容建议优先使用标注为“本地处理”的工具</span>
     </footer>
   </div>
 
@@ -69,7 +77,7 @@
         <div>
           <span id="dialogIcon" class="tool-icon"></span>
           <div>
-            <h2 id="dialogTitle"></h2>
+            <div class="dialog-title-row"><h2 id="dialogTitle"></h2><span id="dialogLocalBadge" class="local-badge">本地处理</span></div>
             <p id="dialogDesc"></p>
           </div>
         </div>
@@ -78,14 +86,6 @@
       <div id="toolMount" class="tool-mount"></div>
     </div>
   </dialog>
-
-  <template id="textAreaTemplate">
-    <div class="editor-stack">
-      <textarea class="input-area" spellcheck="false"></textarea>
-      <div class="toolbar"></div>
-      <div class="output-panel"></div>
-    </div>
-  </template>
 
   <script src="./app.js"></script>
 </body>
