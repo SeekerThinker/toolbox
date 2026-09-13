@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Toolbox：长期使用的思维、专注与个人工作方法工具。" />
+  <meta name="description" content="Toolbox：从待办出发，把思考、专注和历史记录连接在一起。" />
   <meta name="theme-color" content="#f5f6f8" />
   <title>Toolbox</title>
   <link rel="stylesheet" href="./styles.css" />
@@ -16,39 +16,49 @@
         <span class="brand-copy"><strong>Toolbox</strong></span>
       </a>
       <div class="top-actions">
-        <button id="recentBtn" class="ghost-btn" type="button">↻ 最近</button>
-        <button id="favoritesBtn" class="ghost-btn" type="button">★ 收藏</button>
+        <button id="dataBtn" class="ghost-btn" type="button">数据</button>
         <button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button>
       </div>
     </header>
 
     <main>
-      <section class="tool-finder" aria-label="查找工具">
-        <div class="search-wrap">
-          <span aria-hidden="true">⌕</span>
-          <input id="searchInput" type="search" placeholder="搜索番茄钟、任务拆解、决策、复盘、费曼…" autocomplete="off" />
-          <kbd>/</kbd>
+      <section class="task-center" aria-label="待办事项">
+        <div class="task-capture">
+          <input id="taskInput" class="task-capture-input" type="text" placeholder="最近想做什么？" autocomplete="off" />
+          <button id="addTaskBtn" class="primary-btn" type="button">添加</button>
         </div>
-        <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
+        <div class="task-section-head">
+          <div><h2>待办</h2><span id="taskCount" class="result-count"></span></div>
+          <div class="task-filters">
+            <button id="taskFilterOpen" class="mini-btn active" type="button">待办</button>
+            <button id="taskFilterDone" class="mini-btn" type="button">已完成</button>
+          </div>
+        </div>
+        <div id="taskList" class="task-list"></div>
       </section>
 
-      <section class="workspace">
-        <div class="section-heading">
-          <h2 id="sectionTitle">全部工具</h2>
+      <section class="method-section" aria-label="方法工具">
+        <div class="section-heading method-heading">
+          <h2 id="sectionTitle">方法工具</h2>
           <span id="resultCount" class="result-count"></span>
+        </div>
+        <div class="tool-finder">
+          <div class="search-wrap">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="搜索任务拆解、决策、复盘、番茄钟…" autocomplete="off" />
+            <kbd>/</kbd>
+          </div>
+          <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
         </div>
         <div id="toolGrid" class="tool-grid"></div>
         <div id="emptyState" class="empty-state" hidden>
-          <div>⌕</div>
-          <h3>没有找到匹配的工具</h3>
-          <p>换个关键词，或切回“全部”。</p>
+          <div>⌕</div><h3>没有找到匹配的工具</h3><p>换个关键词，或切回“全部”。</p>
         </div>
       </section>
     </main>
 
     <footer>
       <span>Local-first</span>
-      <a id="dataBtn" href="#">数据备份</a>
       <a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a>
     </footer>
   </div>
@@ -72,5 +82,6 @@
   <script defer src="./core.js"></script>
   <script defer src="./tools-focus.js"></script>
   <script defer src="./tools-thinking.js"></script>
+  <script defer src="./tasks.js"></script>
 </body>
 </html>
