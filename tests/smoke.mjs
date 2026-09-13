@@ -1,12 +1,12 @@
 import fs from "node:fs";
 
-const files=["core.js","cloud-config.js","sync.js","account-lifecycle.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
+const files=["core.js","cloud-config.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
 const index=fs.readFileSync("index.html","utf8");
 for(const file of files){
   if(!fs.existsSync(file))throw new Error(`missing ${file}`);
   if(!index.includes(`./${file}`))throw new Error(`index does not load ${file}`);
 }
-for(const css of ["horizons.css","calibration.css"]){if(!fs.existsSync(css)||!index.includes(`./${css}`))throw new Error(`missing style ${css}`);}
+for(const css of ["horizons.css","calibration.css","cloud.css"]){if(!fs.existsSync(css)||!index.includes(`./${css}`))throw new Error(`missing style ${css}`);}
 const source=files.map(file=>fs.readFileSync(file,"utf8")).join("\n");
 const tasks=fs.readFileSync("tasks.js","utf8");
 const thinking=fs.readFileSync("tools-thinking.js","utf8");
@@ -15,6 +15,7 @@ const horizons=fs.readFileSync("horizons.js","utf8");
 const calibration=fs.readFileSync("calibration.js","utf8");
 const sync=fs.readFileSync("sync.js","utf8");
 const lifecycle=fs.readFileSync("account-lifecycle.js","utf8");
+const diagnostics=fs.readFileSync("cloud-diagnostics.js","utf8");
 const cloudConfig=fs.readFileSync("cloud-config.js","utf8");
 const migrationPath="supabase/migrations/20260913103000_create_toolbox_sync.sql";
 const migration=fs.readFileSync(migrationPath,"utf8");
@@ -64,6 +65,9 @@ for(const token of ["flowType: \"pkce\"","toolbox:data-changed","lastSyncedHash"
   if(!sync.includes(token))throw new Error(`sync layer missing token: ${token}`);
 }
 if(!sync.includes("登录前不会上传")||!sync.includes("enabled:false"))throw new Error("cloud upload must require explicit opt-in");
+for(const token of ["检查云端连接","toolbox_sync","delete-account","confirmation_required","不会上传、覆盖或删除任何数据"]){
+  if(!diagnostics.includes(token))throw new Error(`cloud diagnostics missing token: ${token}`);
+}
 
 if(fs.existsSync("supabase/schema.sql"))throw new Error("database schema must live in versioned migrations, not a second schema.sql source");
 if(!fs.existsSync(migrationPath))throw new Error("cloud migration is missing");
@@ -78,4 +82,4 @@ if(/SUPABASE_SECRET_KEYS|sb_secret_|service_role/.test(deleteAccount))throw new 
 if(!deleteAccountDeno.includes('"@supabase/server": "npm:@supabase/server"'))throw new Error("Edge Function dependency map is missing");
 if(!gitignore.includes("supabase/functions/.env")||!gitignore.includes("supabase/.temp/"))throw new Error("local Supabase secrets/state must be ignored");
 
-console.log(`ok: ${ids.length} methods, optional local-first system, calibration, opt-in sync, migrations and account deletion enabled`);
+console.log(`ok: ${ids.length} methods, optional local-first system, calibration, opt-in sync, diagnostics, migrations and account deletion enabled`);
