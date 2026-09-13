@@ -11,6 +11,30 @@
   "theme_color": "#f5f6f8",
   "prefer_related_applications": false,
   "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "新建待办",
+      "short_name": "新建",
+      "description": "直接打开 Toolbox 的快速待办输入",
+      "url": "./?capture=1",
+      "icons": [
+        {
+          "src": "./pwa-icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./?capture=share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
     {
       "src": "./pwa-icon-192.svg",
