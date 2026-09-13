@@ -5,7 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <meta name="description" content="Toolbox：从一件待办出发，把任务、专注、思考、计划、目标与长期元认知连接起来。" />
   <meta name="theme-color" content="#f5f6f8" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Toolbox" />
   <title>Toolbox</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./pwa-icon-192.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="./styles.css" />
   <link rel="stylesheet" href="./horizons.css" />
   <link rel="stylesheet" href="./calibration.css" />
@@ -43,6 +48,6 @@
     <footer><span>Local-first</span><a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a></footer>
   </div>
   <dialog id="toolDialog"><div class="dialog-shell"><div class="dialog-head"><div><span id="dialogIcon" class="tool-icon"></span><div><div class="dialog-title-row"><h2 id="dialogTitle"></h2><span id="dialogLocalBadge" class="local-badge">本地处理</span></div><p id="dialogDesc"></p></div></div><button id="closeDialogBtn" class="icon-btn" type="button" aria-label="关闭">×</button></div><div id="toolMount" class="tool-mount"></div></div></dialog>
-  <script defer src="./core.js"></script><script defer src="./cloud-config.js"></script><script defer src="./sync.js"></script><script defer src="./account-lifecycle.js"></script><script defer src="./cloud-diagnostics.js"></script><script defer src="./tools-focus.js"></script><script defer src="./tools-thinking.js"></script><script defer src="./tasks.js"></script><script defer src="./horizons.js"></script><script defer src="./calibration.js"></script>
+  <script defer src="./core.js"></script><script defer src="./cloud-config.js"></script><script defer src="./sync.js"></script><script defer src="./account-lifecycle.js"></script><script defer src="./cloud-diagnostics.js"></script><script defer src="./tools-focus.js"></script><script defer src="./tools-thinking.js"></script><script defer src="./tasks.js"></script><script defer src="./horizons.js"></script><script defer src="./calibration.js"></script><script defer src="./pwa.js"></script>
 </body>
 </html>
