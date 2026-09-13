@@ -1,4 +1,4 @@
-# Toolbox · 效率与思维工具箱
+# Toolbox
 
 一个轻量、开源、Local-first 的实用工具集合。
 
@@ -19,24 +19,24 @@
 | **写作** | 字数统计、Markdown 预览、会议议程生成器 |
 | **开发** | JSON 格式化、URL 编解码、Base64 编解码 |
 | **隐私** | 敏感信息打码、密码 / UUID / 随机字符串 |
-| **思维** | Brain Dump、任务拆解、艾森豪威尔矩阵、加权决策矩阵、5 Whys、Pre-mortem、每日 / 每周复盘、费曼学习卡 |
+| **思维** | Brain Dump、任务拆解、艾森豪威尔矩阵、加权决策矩阵、5 Whys、事前风险推演、每日 / 每周复盘、费曼学习卡 |
 | **专注** | 番茄钟、深度工作计时 |
 
 ## 使用体验
 
 - `/` 快捷键聚焦搜索
-- 分类筛选
-- 收藏
-- 最近使用
-- 深色模式
-- 响应式布局
-- 思维与专注记录使用 `localStorage` 保存在当前浏览器
+- 分类筛选、收藏、最近使用
+- 深色模式与响应式布局
+- 无账号也可以完整使用
+- 大多数数据保存在当前浏览器
 
-## Local-first
+## 数据与 Local-first
 
-大多数工具直接使用浏览器能力运行，文本、表格、图片、PDF、思维记录和专注记录尽量在本地处理。
+Toolbox 使用统一的 `toolbox:data:v1` 本地数据结构保存偏好、收藏、最近使用和部分工具状态。旧版 `deskkit:*` 数据会自动迁移，不会因为项目改名而丢失。
 
-少数功能会在打开对应工具时从 jsDelivr CDN 按需加载开源组件：
+统一数据层同时提供导入 / 导出能力，后续如果加入可选账号，可以在不改变工具逻辑的前提下增加云同步适配器。
+
+PDF、图片、文本、表格和思维输入默认在浏览器中处理。少数功能会在打开时从 jsDelivr 按需加载固定版本的开源组件：
 
 | 组件 | 用途 |
 | --- | --- |
@@ -50,17 +50,14 @@ OCR 还需要在线下载识别引擎和语言模型。
 ## 技术结构
 
 ```text
-index.html          # 首页与工具容器
-styles.css          # 基础视觉与响应式布局
-compact.css         # 首页紧凑布局
-app.js              # 基础工具与工作台逻辑
-v2-core.js          # 数据、计算、隐私等工具
-v2-media.js         # PDF、图片、OCR、二维码
-v2-fixes.js         # 兼容性修正
-v3-register.js      # 思维 / 专注工具注册
-v3-focus.js         # 番茄钟、深度工作
-v3-thinking-a.js    # Brain Dump、任务拆解、优先级、决策
-v3-thinking-b.js    # 根因分析、风险推演、复盘、费曼学习
+index.html          # 页面结构
+styles.css          # 全部样式
+core.js             # 工具注册、搜索、收藏、主题、统一存储
+├─ tools-basic.js   # 文本、写作、基础开发工具
+├─ tools-utility.js # 计算、日期、数据、隐私工具
+├─ tools-media.js   # PDF、图片、OCR、二维码
+├─ tools-focus.js   # 番茄钟、深度工作
+└─ tools-thinking.js# 拆解、决策、复盘等思维工具
 ```
 
 技术栈：**HTML + CSS + Vanilla JavaScript**。无框架、无 npm 依赖、无构建流程。
@@ -71,30 +68,31 @@ v3-thinking-b.js    # 根因分析、风险推演、复盘、费曼学习
 python3 -m http.server 8080
 ```
 
-访问：
+然后访问 `http://localhost:8080`。
 
-```text
-http://localhost:8080
+## 静态检查
+
+```bash
+node --check core.js
+node --check tools-basic.js
+node --check tools-utility.js
+node --check tools-media.js
+node --check tools-focus.js
+node --check tools-thinking.js
+node tests/smoke.mjs
 ```
 
-## GitHub Pages
-
-1. `Settings → Pages`
-2. Source：`Deploy from a branch`
-3. Branch：`main`
-4. Folder：`/(root)`
+GitHub Actions 会在 push 和 pull request 时自动执行这些检查。
 
 ## Roadmap
 
-- PDF 压缩、旋转、图片转 PDF
-- 图片裁剪与批量压缩
-- 时区 / 跨时区会议转换
-- 正则表达式测试器
-- JSON / YAML 互转
-- 文件 SHA-256 校验
-- 中文标点规范化
+当前优先级是稳定性和数据模型，而不是继续堆工具：
+
+- 数据导入 / 导出 UI
+- 可选账号与跨设备同步
 - PWA / 离线安装
-- 可选账号与跨设备数据同步
+- 第三方脚本完整性与更严格的安全策略
+- 在确有高频需求时再补充新工具
 
 ## License
 
