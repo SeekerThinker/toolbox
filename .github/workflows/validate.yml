@@ -17,5 +17,15 @@ jobs:
           node --check tools-thinking.js
           node --check tasks.js
           node --check horizons.js
+          node --check word-writing-templates/app.js
+          node --check word-writing-templates/feedback.js
       - name: Run smoke checks
         run: node tests/smoke.mjs
+      - name: Check Word template selector integration
+        run: |
+          test -f catalog.yml
+          grep -q 'word-writing-templates' catalog.yml
+          grep -q './word-writing-templates/' index.html
+          grep -q 'structuredDownload' word-writing-templates/app.js
+          grep -q '罗马数字前置页码' word-writing-templates/app.js
+          grep -q 'word_compatibility_report.yml' word-writing-templates/feedback.js

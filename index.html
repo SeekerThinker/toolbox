@@ -13,7 +13,7 @@
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="#" aria-label="Toolbox 首页"><span class="brand-mark">T</span><span class="brand-copy"><strong>Toolbox</strong></span></a>
-      <div class="top-actions"><button id="dataBtn" class="ghost-btn" type="button">数据</button><button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button></div>
+      <div class="top-actions"><a class="ghost-btn" style="text-decoration:none;display:inline-flex;align-items:center" href="./word-writing-templates/">Word 模板</a><button id="dataBtn" class="ghost-btn" type="button">数据</button><button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button></div>
     </header>
     <main>
       <section class="task-center" aria-label="待办事项">
@@ -37,7 +37,7 @@
         </div>
       </details>
     </main>
-    <footer><span>Local-first</span><a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a></footer>
+    <footer><span>Local-first · <a href="./word-writing-templates/">Word 结构化写作模板</a></span><a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a></footer>
   </div>
   <dialog id="toolDialog"><div class="dialog-shell"><div class="dialog-head"><div><span id="dialogIcon" class="tool-icon"></span><div><div class="dialog-title-row"><h2 id="dialogTitle"></h2><span id="dialogLocalBadge" class="local-badge">本地处理</span></div><p id="dialogDesc"></p></div></div><button id="closeDialogBtn" class="icon-btn" type="button" aria-label="关闭">×</button></div><div id="toolMount" class="tool-mount"></div></div></dialog>
   <script defer src="./core.js"></script><script defer src="./tools-focus.js"></script><script defer src="./tools-thinking.js"></script><script defer src="./tasks.js"></script><script defer src="./horizons.js"></script>
