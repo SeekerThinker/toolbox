@@ -13,10 +13,9 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check core.js
-          node --check tools-basic.js
-          node --check tools-utility.js
-          node --check tools-media.js
+          node --check tools-practical.js
           node --check tools-focus.js
           node --check tools-thinking.js
+          node --check tools-external.js
       - name: Run smoke checks
         run: node tests/smoke.mjs
