@@ -23,6 +23,7 @@ jobs:
           node --check horizons.js
           node --check calibration.js
           node --check pwa.js
+          node --check capture.js
           node --check sw.js
       - name: Run smoke checks
         run: |
