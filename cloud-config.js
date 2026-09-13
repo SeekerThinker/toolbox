@@ -4,6 +4,6 @@
     provider: "supabase",
     url: "https://bmclrtrtzntzrhudwisv.supabase.co",
     publishableKey: "",
-    oauthProviders: ["github", "google"]
+    oauthProviders: ["github"]
   });
 })();
