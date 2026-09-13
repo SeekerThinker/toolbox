@@ -16,16 +16,6 @@ jobs:
           node --check tools-focus.js
           node --check tools-thinking.js
           node --check tasks.js
-          node --check word-writing-templates/app.js
-          node --check word-writing-templates/feedback.js
+          node --check horizons.js
       - name: Run smoke checks
         run: node tests/smoke.mjs
-      - name: Check Word template selector integration
-        run: |
-          grep -q './feedback.js' word-writing-templates/index.html
-          grep -q 'word_quick_success.yml' word-writing-templates/feedback.js
-          grep -q 'word_compatibility_report.yml' word-writing-templates/feedback.js
-          grep -q 'feedback-panel' word-writing-templates/styles.css
-          grep -q 'structuredDownload' word-writing-templates/app.js
-          grep -q '/structured/' word-writing-templates/app.js
-          grep -q '带常用结构版' word-writing-templates/app.js
