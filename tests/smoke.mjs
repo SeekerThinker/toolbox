@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const files=["core.js","cloud-config.js","sync.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
+const files=["core.js","cloud-config.js","sync.js","account-lifecycle.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
 const index=fs.readFileSync("index.html","utf8");
 for(const file of files){
   if(!fs.existsSync(file))throw new Error(`missing ${file}`);
@@ -14,8 +14,10 @@ const focus=fs.readFileSync("tools-focus.js","utf8");
 const horizons=fs.readFileSync("horizons.js","utf8");
 const calibration=fs.readFileSync("calibration.js","utf8");
 const sync=fs.readFileSync("sync.js","utf8");
+const lifecycle=fs.readFileSync("account-lifecycle.js","utf8");
 const cloudConfig=fs.readFileSync("cloud-config.js","utf8");
 const schema=fs.readFileSync("supabase/schema.sql","utf8");
+const deleteAccount=fs.readFileSync("supabase/functions/delete-account/index.ts","utf8");
 const ids=[...source.matchAll(/registerTool\(\{\s*id:\s*"([^"]+)"/g)].map(m=>m[1]);
 
 if(ids.length!==8)throw new Error(`expected 8 methods, found ${ids.length}`);
@@ -62,4 +64,9 @@ if(!fs.existsSync("supabase/schema.sql"))throw new Error("cloud schema is missin
 if(!/enable row level security/i.test(schema)||!schema.includes("auth.uid()")||!/security invoker/i.test(schema))throw new Error("cloud schema must enforce authenticated per-user RLS");
 if(!schema.includes("expected_revision")||!schema.includes("sync_conflict"))throw new Error("cloud writes need optimistic concurrency protection");
 
-console.log(`ok: ${ids.length} methods, optional local-first system, long-term calibration and opt-in cloud sync enabled`);
+if(!lifecycle.includes("delete-account")||!lifecycle.includes("删除账号及云端数据")||!lifecycle.includes("当前浏览器里的本地数据会保留"))throw new Error("account deletion lifecycle is incomplete");
+if(!deleteAccount.includes("SUPABASE_SECRET_KEYS")||!deleteAccount.includes("auth.getUser(token)")||!deleteAccount.includes("auth.admin.deleteUser(user.id)"))throw new Error("account deletion must verify the caller and delete through server-side admin credentials");
+if(deleteAccount.includes("sb_secret_"))throw new Error("server secret must never be hard-coded in the repository");
+if(!schema.includes("on delete cascade"))throw new Error("deleting an auth user should cascade to synced Toolbox data");
+
+console.log(`ok: ${ids.length} methods, optional local-first system, calibration, opt-in sync and account deletion enabled`);
