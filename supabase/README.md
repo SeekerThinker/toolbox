@@ -15,7 +15,7 @@ supabase/
         └── index.ts
 ```
 
-数据库迁移文件是云端结构的唯一真相来源。进入 CLI 工作流后，不要再直接在生产 SQL Editor / Table Editor 中修改同一套结构，以免远端迁移历史和仓库失步。
+数据库 migration 是云端结构的唯一真相来源。进入 CLI 工作流后，不要再直接在生产 SQL Editor / Table Editor 中修改同一套结构，以免远端迁移历史和仓库失步。
 
 ## 1. 本地验证
 
@@ -38,12 +38,13 @@ python3 -m http.server 8080
 
 ## 2. 创建并连接远端项目
 
-在 Supabase 创建项目后：
+在 Supabase 创建项目后，可先从本地完成第一次连接：
 
 ```bash
 supabase login
 supabase link --project-ref YOUR_PROJECT_REF
 supabase db push
+supabase functions deploy delete-account
 ```
 
 迁移会创建：
@@ -53,9 +54,36 @@ supabase db push
 - `toolbox_push`：使用 `revision` 做乐观并发控制；
 - `auth.users → toolbox_sync` 的 `ON DELETE CASCADE`：永久删除账号身份时自动删除同步数据。
 
-以后数据库结构变化继续新增 migration，再运行 `supabase db push`，不要覆盖旧 migration。
+以后数据库结构变化继续新增 migration，不覆盖旧 migration。
 
-## 3. 配置站点 URL 与 OAuth
+## 3. 生产部署工作流
+
+仓库包含手动工作流：
+
+```text
+.github/workflows/deploy-supabase.yml
+```
+
+在 GitHub repository secrets 中配置：
+
+```text
+SUPABASE_ACCESS_TOKEN
+SUPABASE_DB_PASSWORD
+SUPABASE_PROJECT_ID
+```
+
+然后从 GitHub Actions 手动运行 `deploy-supabase`。工作流会：
+
+```text
+link project
+→ db push --dry-run
+→ db push
+→ deploy delete-account
+```
+
+它故意没有设置为每次 push 自动部署；在云端项目、OAuth 和前端 `cloud-config.js` 尚未完成之前，不会误触发生产变更。需要自动发布时，再把触发条件升级为 main 分支部署。
+
+## 4. 配置站点 URL 与 OAuth
 
 在 Supabase Auth 的 URL Configuration 中设置：
 
@@ -84,24 +112,18 @@ https://YOUR_PROJECT.supabase.co/auth/v1/callback
 
 5. 把 GitHub Client ID / Client Secret 只填进 Supabase Auth provider 配置，不写入仓库。
 
-## 4. 部署账号删除 Edge Function
-
-执行：
-
-```bash
-supabase functions deploy delete-account
-```
+## 5. 账号删除 Edge Function
 
 `delete-account` 使用 `@supabase/server` 的 `auth: "user"` 上下文验证调用者，并通过 `ctx.supabaseAdmin` 在服务端删除当前用户身份。
 
 Supabase 会给函数环境提供项目 URL、publishable keys、secret keys 和 JWT 验证配置；管理员 secret 不进入浏览器，也不硬编码到函数源码。
 
-账号面板因此有两种不同操作：
+账号面板有两种不同操作：
 
 - **删除我的云端同步数据**：只删除 `toolbox_sync` 云端副本，保留登录身份；
 - **删除账号及云端数据**：永久删除 Auth 身份，并通过外键级联删除同步数据；当前浏览器本地工作台仍保留。
 
-## 5. 填写浏览器配置
+## 6. 填写浏览器配置
 
 编辑仓库根目录 `cloud-config.js`：
 
@@ -116,7 +138,7 @@ window.ToolboxCloudConfig = Object.freeze({
 
 这里只允许放 **Project URL + publishable key**。不要把 `sb_secret_...`、legacy `service_role` key、OAuth Client Secret 或数据库密码写进静态前端或 Git 仓库。
 
-## 6. 同步行为
+## 7. 同步行为
 
 - 未登录：完全本地使用；
 - 已登录但未点“开始同步”：不上传本地数据；
@@ -127,7 +149,7 @@ window.ToolboxCloudConfig = Object.freeze({
 - RLS 将每位用户限制在自己的同步行；
 - 删除账号不会删除当前浏览器里的 `toolbox:data:v1`。
 
-## 7. 上线前检查
+## 8. 上线前检查
 
 至少验证：
 
