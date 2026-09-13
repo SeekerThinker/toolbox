@@ -11,80 +11,28 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <a class="brand" href="#" aria-label="Toolbox 首页">
-        <span class="brand-mark">T</span>
-        <span class="brand-copy"><strong>Toolbox</strong></span>
-      </a>
-      <div class="top-actions">
-        <button id="dataBtn" class="ghost-btn" type="button">数据</button>
-        <button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button>
-      </div>
+      <a class="brand" href="#" aria-label="Toolbox 首页"><span class="brand-mark">T</span><span class="brand-copy"><strong>Toolbox</strong></span></a>
+      <div class="top-actions"><button id="dataBtn" class="ghost-btn" type="button">数据</button><button id="themeBtn" class="icon-btn" type="button" aria-label="切换主题">◐</button></div>
     </header>
-
     <main>
       <section class="task-center" aria-label="待办事项">
-        <div class="task-capture">
-          <input id="taskInput" class="task-capture-input" type="text" placeholder="最近想做什么？" autocomplete="off" />
-          <button id="addTaskBtn" class="primary-btn" type="button">添加</button>
-        </div>
-        <div class="task-section-head">
-          <div><h2>待办</h2><span id="taskCount" class="result-count"></span></div>
-          <div class="task-filters">
-            <button id="taskFilterOpen" class="mini-btn active" type="button">待办</button>
-            <button id="taskFilterDone" class="mini-btn" type="button">已完成</button>
-          </div>
-        </div>
+        <div class="task-capture"><textarea id="taskInput" class="task-capture-input" rows="1" placeholder="最近想做什么？一行一件事" autocomplete="off"></textarea><button id="addTaskBtn" class="primary-btn" type="button">添加</button></div>
+        <div class="task-section-head"><div><h2>待办</h2><span id="taskCount" class="result-count"></span></div><div class="task-filters"><button id="taskFilterOpen" class="mini-btn active" type="button">待办</button><button id="taskFilterMatrix" class="mini-btn" type="button">四象限</button><button id="taskFilterDone" class="mini-btn" type="button">已完成</button></div></div>
         <div id="taskList" class="task-list"></div>
       </section>
-
       <details class="method-section">
-        <summary class="method-summary"><strong>方法库</strong><span>展开</span></summary>
+        <summary class="method-summary"><strong>方法库</strong><span>按需展开</span></summary>
         <div class="method-body">
-          <div class="section-heading method-heading" aria-hidden="true">
-            <h2 id="sectionTitle">方法工具</h2>
-            <span id="resultCount" class="result-count"></span>
-          </div>
-          <div class="tool-finder">
-            <div class="search-wrap">
-              <span aria-hidden="true">⌕</span>
-              <input id="searchInput" type="search" placeholder="搜索任务拆解、决策、复盘、番茄钟…" autocomplete="off" />
-              <kbd>/</kbd>
-            </div>
-            <div id="categoryTabs" class="chips" aria-label="工具分类"></div>
-          </div>
+          <div class="section-heading method-heading" aria-hidden="true"><h2 id="sectionTitle">方法工具</h2><span id="resultCount" class="result-count"></span></div>
+          <div class="tool-finder"><div class="search-wrap"><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="搜索任务拆解、决策记录、原因探索、复盘…" autocomplete="off" /><kbd>/</kbd></div><div id="categoryTabs" class="chips" aria-label="工具分类"></div></div>
           <div id="toolGrid" class="tool-grid"></div>
-          <div id="emptyState" class="empty-state" hidden>
-            <div>⌕</div><h3>没有找到匹配的工具</h3><p>换个关键词，或切回“全部”。</p>
-          </div>
+          <div id="emptyState" class="empty-state" hidden><div>⌕</div><h3>没有找到匹配的方法</h3><p>换个关键词，或切回“全部”。</p></div>
         </div>
       </details>
     </main>
-
-    <footer>
-      <span>Local-first</span>
-      <a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a>
-    </footer>
+    <footer><span>Local-first</span><a href="https://github.com/SeekerThinker/toolbox" target="_blank" rel="noreferrer">GitHub ↗</a></footer>
   </div>
-
-  <dialog id="toolDialog">
-    <div class="dialog-shell">
-      <div class="dialog-head">
-        <div>
-          <span id="dialogIcon" class="tool-icon"></span>
-          <div>
-            <div class="dialog-title-row"><h2 id="dialogTitle"></h2><span id="dialogLocalBadge" class="local-badge">本地处理</span></div>
-            <p id="dialogDesc"></p>
-          </div>
-        </div>
-        <button id="closeDialogBtn" class="icon-btn" type="button" aria-label="关闭">×</button>
-      </div>
-      <div id="toolMount" class="tool-mount"></div>
-    </div>
-  </dialog>
-
-  <script defer src="./core.js"></script>
-  <script defer src="./tools-focus.js"></script>
-  <script defer src="./tools-thinking.js"></script>
-  <script defer src="./tasks.js"></script>
+  <dialog id="toolDialog"><div class="dialog-shell"><div class="dialog-head"><div><span id="dialogIcon" class="tool-icon"></span><div><div class="dialog-title-row"><h2 id="dialogTitle"></h2><span id="dialogLocalBadge" class="local-badge">本地处理</span></div><p id="dialogDesc"></p></div></div><button id="closeDialogBtn" class="icon-btn" type="button" aria-label="关闭">×</button></div><div id="toolMount" class="tool-mount"></div></div></dialog>
+  <script defer src="./core.js"></script><script defer src="./tools-focus.js"></script><script defer src="./tools-thinking.js"></script><script defer src="./tasks.js"></script>
 </body>
 </html>
