@@ -133,6 +133,14 @@ supabase start
 supabase db reset
 ```
 
+## 相关独立项目：Word 结构化思考与写作模板
+
+Toolbox 会索引一个独立维护的 Word 写作项目：[`word-writing-templates`](https://github.com/SeekerThinker/word-writing-templates)。它把 Word 的标题层级和导航窗格当成结构化思考工具，让同一份文档从想法、大纲、正文一直成长到最终成稿。
+
+在线选择器：**https://seekerthinker.github.io/toolbox/word-writing-templates/**
+
+这里刻意保持边界：Toolbox 只负责发现与选择，不复制模板源码或二进制文件；模板生成、Release、Issues、兼容性记录和真实 Word 反馈都留在独立仓库。
+
 ## 当前方向
 
 接下来的重点不是增加工具数量，而是继续减少一件事从“想到”到“完成”的摩擦：
