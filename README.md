@@ -91,9 +91,11 @@ Toolbox 可以作为 PWA 安装到支持的手机和桌面环境，并支持离�
 - 用户可以删除云端同步数据，也可以永久删除账号及云端数据
 - 删除云端内容不会删除当前浏览器里的本地工作台
 
+多端冲突规则集中在 `sync-policy.js`，生产同步代码与 CI 契约测试共用同一套决策：首次已有云端数据、后台发现远端更新、以及双端同时修改时，都不会静默覆盖本机内容。
+
 生产 Supabase 后端已经部署：`toolbox_sync` 使用 Row Level Security 按 `user_id` 隔离，匿名用户不能读写同步数据；`toolbox_push` 负责并发安全写入；`delete-account` Edge Function 负责永久删除登录身份和云端数据。
 
-面向普通用户的登录方式按产品方能力配置启用。邮箱 OTP 需要正式 SMTP 才会开放；微信登录需要微信开放平台 / 自定义 OAuth 配置。用户不会接触 Supabase key、回调地址或开发者配置。
+面向普通用户的登录方式按产品方能力配置启用。邮箱 OTP 需要正式 SMTP 才会开放；微信登录需要微信开放平台，并通过兼容层接入，不会把未验证的登录入口暴露给用户。用户不会接触 Supabase key、回调地址或开发者配置。
 
 ## 技术结构
 
@@ -107,12 +109,13 @@ tools-thinking.js                # 思考方法
 tools-focus.js                   # 番茄钟与深度工作
 horizons.js                      # 日 / 周 / 月 / 年方向、目标与洞察
 calibration.js                   # 长期校准
-sync.js                          # 可选账号同步与冲突处理
+sync-policy.js                   # 多端同步冲突决策（生产与测试共用）
+sync.js                          # 可选账号同步与具体云端 I/O
 account-lifecycle.js             # 账号删除生命周期
 pwa.js / capture.js              # PWA 安装与移动捕获
 supabase/migrations/             # 数据库结构、RLS、并发控制
 supabase/functions/delete-account/ # 永久删除账号 Edge Function
-tests/smoke.mjs                  # 产品模型与关键能力 smoke test
+tests/                           # 产品模型、PWA、登录表面和同步契约测试
 ```
 
 Supabase JS 只在需要账号 / 同步时加载。数据库和 Edge Function 使用标准 Supabase CLI 项目结构管理。
