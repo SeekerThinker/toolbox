@@ -31,8 +31,10 @@ for (const token of ['params.get("capture")', 'mode === "share"', '#taskInput', 
 }
 if (/\.click\(\)|storage\.set|addTask/i.test(capture)) throw new Error("shared content must be confirmed before creating a task");
 
-if (!sw.includes("toolbox-shell-v2") || !sw.includes("request.mode === \"navigate\"") || !sw.includes('"./capture.js"')) throw new Error("offline app shell is incomplete");
-if (!sw.includes('url.pathname.endsWith("/cloud-config.js")') || !sw.includes("networkFirst(request)")) throw new Error("cloud config must stay network-first");
-if (!sw.includes("url.origin !== self.location.origin")) throw new Error("service worker must not cache third-party requests");
+if (!sw.includes("toolbox-shell-v3") || !sw.includes("request.mode === \"navigate\"") || !sw.includes('"./capture.js"')) throw new Error("offline app shell is incomplete");
+for (const file of ["cloud-public.js", "cloud-config.js"]) {
+  if (!sw.includes(`url.pathname.endsWith("/${file}")`) || !sw.includes(`"./${file}"`)) throw new Error(`${file} must be cached but refreshed network-first`);
+}
+if (!sw.includes("networkFirst(request)") || !sw.includes("url.origin !== self.location.origin")) throw new Error("service worker network safety is incomplete");
 
-console.log("ok: installable PWA, offline cache, quick capture and safe share target enabled");
+console.log("ok: installable PWA, offline cache, quick capture, safe share target and fresh auth config enabled");
