@@ -4,6 +4,7 @@ const read = (path) => fs.readFileSync(path, 'utf8');
 const app = read('word-writing-templates/app.js');
 const page = read('word-writing-templates/index.html');
 const root = read('index.html');
+const readme = read('README.md');
 const catalog = read('catalog.yml');
 
 const must = (condition, message) => {
@@ -11,7 +12,8 @@ const must = (condition, message) => {
 };
 
 must(page.includes('./app.js') && page.includes('./styles.css'), 'selector page assets missing');
-must(root.includes('./word-writing-templates/'), 'Toolbox does not link to Word selector');
+must(!root.includes('word-writing-templates'), 'Word selector must stay outside the core task UI');
+must(readme.includes('word-writing-templates') && readme.includes('在线选择器'), 'README does not document the independent Word project');
 must(catalog.includes('word-writing-templates') && catalog.includes('SeekerThinker/word-writing-templates'), 'catalog does not index independent Word project');
 
 for (const filename of [
