@@ -31,8 +31,8 @@
     if (!urlReady || keyReady) return;
     mount.insertAdjacentHTML("beforeend", `<div class="cloud-key-setup">
       <label class="field"><span class="help-text">Supabase Publishable Key</span><input class="text-input" data-cloud-key-input type="password" autocomplete="off" placeholder="sb_publishable_…"></label>
-      <div class="toolbar"><button class="primary-btn" data-save-cloud-key type="button">保存并重新加载</button></div>
-      <span class="help-text">这里只接受浏览器公开的 <code>sb_publishable_…</code>。不要粘贴 <code>sb_secret_…</code>、service_role 或数据库密码。这个值只保存在当前浏览器。</span>
+      <div class="toolbar"><button class="primary-btn" data-save-cloud-key type="button">连接这台设备</button></div>
+      <span class="help-text">在 Supabase → Settings → API Keys 复制 default Publishable key。这里只接受浏览器公开的 <code>sb_publishable_…</code>；不要粘贴 <code>sb_secret_…</code>、service_role 或数据库密码。这个值只保存在当前浏览器。</span>
     </div>`);
     const input = mount.querySelector("[data-cloud-key-input]");
     const button = mount.querySelector("[data-save-cloud-key]");
@@ -128,13 +128,19 @@
     const details = document.createElement("details");
     details.className = "task-capability";
     details.dataset.cloudDiagnostics = "1";
-    details.innerHTML = `<summary><strong>连接自检</strong><span>只读检查</span></summary><div class="task-capability-body"><button class="secondary-btn" data-run-cloud-checks type="button">检查云端连接</button><div class="cloud-checks" data-cloud-check-results><span class="help-text">不会上传、覆盖或删除任何数据。</span></div></div>`;
+    details.open = !configured;
+    details.innerHTML = `<summary><strong>${configured ? "连接自检" : "连接云端"}</strong><span>${configured ? "只读检查" : "首次设置"}</span></summary><div class="task-capability-body"><button class="secondary-btn" data-run-cloud-checks type="button">检查云端连接</button><div class="cloud-checks" data-cloud-check-results><span class="help-text">不会上传、覆盖或删除任何数据。</span></div></div>`;
     root.appendChild(details);
-    details.querySelector("[data-run-cloud-checks]").onclick = async () => {
-      const mount = details.querySelector("[data-cloud-check-results]");
+    const button = details.querySelector("[data-run-cloud-checks]");
+    const mount = details.querySelector("[data-cloud-check-results]");
+    button.onclick = async () => {
       mount.innerHTML = `<span class="help-text">正在检查…</span>`;
       await runChecks(mount);
     };
+    if (!configured) {
+      mount.innerHTML = `<span class="help-text">正在读取连接状态…</span>`;
+      runChecks(mount);
+    }
   };
 
   const observer = new MutationObserver(inject);
