@@ -1,4 +1,4 @@
-const CACHE_NAME = "toolbox-shell-v5";
+const CACHE_NAME = "toolbox-shell-v6";
 const SHARE_CACHE = "toolbox-share-inbox-v1";
 const SHARE_ENTRY = new URL("./__share_payload__", self.registration.scope).href;
 const APP_SHELL = [
@@ -8,6 +8,7 @@ const APP_SHELL = [
   "./horizons.css",
   "./calibration.css",
   "./cloud.css",
+  "./readability.css",
   "./manifest.webmanifest",
   "./pwa-icon-192.svg",
   "./pwa-icon-512.svg",
