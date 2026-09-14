@@ -6,7 +6,7 @@ const readme = fs.readFileSync("README.md", "utf8");
 const horizons = fs.readFileSync("horizons.js", "utf8");
 const calibration = fs.readFileSync("calibration.js", "utf8");
 const core = fs.readFileSync("core.js", "utf8");
-const readability = fs.readFileSync("readability.css", "utf8");
+const focus = fs.readFileSync("tools-focus.js", "utf8");
 
 assert.equal(fs.existsSync("catalog.yml"), false, "Toolbox must not keep a catalog for unrelated projects");
 assert.equal(fs.existsSync("word-writing-templates"), false, "independent Word project must not be copied into Toolbox");
@@ -24,6 +24,6 @@ assert.doesNotMatch(horizons, /data-horizon-tab="insights"|insightsView/, "cross
 assert.match(horizons, /data-goal-target-save/, "goal cadence must be configured on the goal itself");
 assert.doesNotMatch(calibration, /data-cal-goal-save|data-cal-goal-target/, "calibration must observe goals, not configure them");
 assert.doesNotMatch(core, /data-fav|favoritesBtn|我的收藏/, "an eight-method curated library does not need a favorites UI");
-assert.match(readability, /#fClear\{display:none\}/, "destructive clearing of accumulated focus history must stay off the public surface");
+assert.doesNotMatch(focus, /id="fClear"|清空全部记录/, "accumulated focus evidence must not have a one-click destructive clear action");
 
 console.log("ok: Toolbox stays task-first, guest-first, curated and free of duplicate product layers");
