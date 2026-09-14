@@ -140,6 +140,12 @@ supabase db reset
 4. 随真实样本积累，逐步增强估时和判断校准
 5. 邮箱登录与多端同步留待确有需求时再开放
 
+## 支持项目
+
+Toolbox 会继续保持开源和可完整使用。若它对你有帮助，并愿意支持后续维护与改进，可以通过 [GitHub Sponsors](https://github.com/sponsors/SeekerThinker) 赞助项目。
+
+赞助完全自愿，不会解锁额外功能，也不会影响项目的开源许可与正常使用。
+
 ## License
 
 MIT
