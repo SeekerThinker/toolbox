@@ -13,7 +13,7 @@ assert.equal(fs.existsSync("word-writing-templates"), false, "independent Word p
 assert.doesNotMatch(index, /word-writing-templates/i, "core UI must not reference the independent Word project");
 assert.doesNotMatch(readme, /word-writing-templates|在线选择器/i, "README must stay focused on Toolbox itself");
 
-assert.match(index, /id="accountBtn"[^>]*hidden/, "guest release must keep account entry hidden");
+assert.doesNotMatch(index, /id="accountBtn"/, "guest release must not render an account entry");
 assert.match(index, /id="dataBtn"[^>]*>备份</, "local backup must be a visible top-level guest action");
 assert.match(index, /<section class="task-center"/, "task center must remain the first primary work surface");
 assert.match(index, /计划、目标与校准/, "secondary planning layer should have one clear calibration concept");
