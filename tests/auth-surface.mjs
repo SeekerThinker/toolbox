@@ -7,20 +7,21 @@ const diagnostics = fs.readFileSync(new URL("../cloud-diagnostics.js", import.me
 const index = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 
 assert.match(publicConfig, /emailOtp:\s*false/, "public email OTP must stay hidden until SMTP is production-ready");
-assert.match(publicConfig, /wechatProvider:\s*""/, "WeChat must stay hidden until a provider is configured");
+assert.doesNotMatch(publicConfig, /wechatProvider|phoneOtp|sms/i, "public auth config must stay guest plus email only");
 assert.match(publicConfig, /accountDeletionEnabled:\s*true/, "account deletion is enabled because the Edge Function is deployed");
 
 assert.match(syncSource, /const emailOtpEnabled = config\.emailOtp === true;/, "email OTP must require explicit product enablement");
-assert.doesNotMatch(syncSource, /config\.emailOtp !== false/, "email OTP must never default open when config is missing");
 assert.match(syncSource, /不登录也能完整使用 Toolbox/, "guest-first message must remain explicit");
-assert.match(syncSource, /登录只用于跨设备同步，不会先上传本机数据/, "login must not imply upload");
-assert.match(syncSource, /wechatProvider\s*\?/, "WeChat button must be conditional");
+assert.match(syncSource, /邮箱登录只用于跨设备同步，不会先上传本机数据/, "email login must not imply upload");
 assert.match(syncSource, /emailOtpEnabled\s*\?/, "email login block must be conditional");
+assert.match(syncSource, /signInWithOtp/, "email OTP request must exist");
+assert.match(syncSource, /verifyOtp/, "email OTP verification must exist");
 assert.match(syncSource, /enabled:false/, "login must leave sync disabled until explicit opt-in");
+assert.doesNotMatch(syncSource, /微信|wechat|signInWithOAuth|phoneOtp|type:\s*"sms"/i, "consumer auth must stay guest plus email only");
 
 assert.doesNotMatch(index, /sb_publishable_|service_role|sb_secret_/i, "HTML must not expose cloud credentials directly");
 assert.doesNotMatch(index, /Supabase|OAuth callback|publishable key/i, "normal product surface must not mention developer cloud setup");
 
 assert.match(diagnostics, /debug=cloud|cloud/i, "developer diagnostics may exist behind an explicit debug path");
 
-console.log("ok: guest-first auth surface stays zero-config and provider-gated");
+console.log("ok: auth surface is guest-first, email-only, zero-config for users");
