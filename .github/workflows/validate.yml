@@ -28,12 +28,14 @@ jobs:
           node --check sw.js
           node --check tests/sync-contract.mjs
           node --check tests/auth-surface.mjs
+          node --check tests/auth-email.mjs
       - name: Run smoke checks
         run: |
           node tests/smoke.mjs
           node tests/pwa.mjs
           node tests/sync-contract.mjs
           node tests/auth-surface.mjs
+          node tests/auth-email.mjs
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
