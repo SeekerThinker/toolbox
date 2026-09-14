@@ -6,7 +6,7 @@
   const SDK_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm";
   const config = window.ToolboxCloudConfig || {};
   const configured = config.provider === "supabase" && /^https:\/\//.test(config.url || "") && /^sb_publishable_/.test(config.publishableKey || "");
-  const emailOtpEnabled = config.emailOtp !== false;
+  const emailOtpEnabled = config.emailOtp === true;
   const wechatProvider = /^custom:[a-z0-9:-]+$/.test(config.wechatProvider || "") ? config.wechatProvider : "";
   let pendingEmail = "";
 
