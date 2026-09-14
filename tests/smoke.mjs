@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const files=["core.js","cloud-public.js","cloud-config.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
+const files=["core.js","cloud-public.js","cloud-config.js","sync-policy.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
 const index=fs.readFileSync("index.html","utf8");
 for(const file of files){
   if(!fs.existsSync(file))throw new Error(`missing ${file}`);
@@ -13,13 +13,20 @@ const thinking=fs.readFileSync("tools-thinking.js","utf8");
 const focus=fs.readFileSync("tools-focus.js","utf8");
 const horizons=fs.readFileSync("horizons.js","utf8");
 const calibration=fs.readFileSync("calibration.js","utf8");
+const syncPolicy=fs.readFileSync("sync-policy.js","utf8");
 const sync=fs.readFileSync("sync.js","utf8");
 const lifecycle=fs.readFileSync("account-lifecycle.js","utf8");
 const diagnostics=fs.readFileSync("cloud-diagnostics.js","utf8");
 const cloudConfig=fs.readFileSync("cloud-config.js","utf8");
 const cloudPublic=fs.readFileSync("cloud-public.js","utf8");
-const migrationPath="supabase/migrations/20260913103000_create_toolbox_sync.sql";
+const migrationPath="supabase/migrations/20260914023912_create_toolbox_sync_table.sql";
 const migration=fs.readFileSync(migrationPath,"utf8");
+const expectedMigrations=[
+  "20260914023912_create_toolbox_sync_table.sql",
+  "20260914023934_secure_toolbox_sync.sql",
+  "20260914023947_add_toolbox_push.sql"
+];
+const migrations=fs.readdirSync("supabase/migrations").filter(name=>name.endsWith(".sql")).sort();
 const supabaseConfig=fs.readFileSync("supabase/config.toml","utf8");
 const deleteAccount=fs.readFileSync("supabase/functions/delete-account/index.ts","utf8");
 const deleteAccountDeno=fs.readFileSync("supabase/functions/delete-account/deno.json","utf8");
@@ -62,9 +69,14 @@ if(!calibration.includes("把事实写入回顾")||!calibration.includes("我的
 if(!calibration.includes("当时置信度 ≥70%")||!calibration.includes("保存回看"))throw new Error("decision calibration loop is incomplete");
 
 if(!index.includes('src="./cloud-public.js"')||index.indexOf('src="./cloud-public.js"')>index.indexOf('src="./cloud-config.js"'))throw new Error("public deployment config must load before cloud config");
+if(index.indexOf('src="./sync-policy.js"')<0||index.indexOf('src="./sync-policy.js"')>index.indexOf('src="./sync.js"'))throw new Error("shared sync policy must load before sync I/O");
 if(!cloudPublic.includes("publishableKey")||!cloudPublic.includes("emailOtp")||!cloudPublic.includes("wechatProvider"))throw new Error("public auth deployment config is incomplete");
 if(/sb_secret_|service_role/.test(cloudPublic))throw new Error("public deployment config must never contain privileged credentials");
 if(!cloudConfig.includes("ToolboxPublicCloudConfig")||!cloudConfig.includes("debugMode")||!cloudConfig.includes("emailOtp")||!cloudConfig.includes("wechatProvider"))throw new Error("cloud config must separate product deployment from debug setup");
+for(const token of ["UPLOAD_NEW","CONFLICT_FIRST","CONFLICT_REMOTE_NEWER","UPLOAD_LOCAL","CONFLICT_BOTH"]){
+  if(!syncPolicy.includes(token))throw new Error(`sync policy missing action: ${token}`);
+}
+if(!sync.includes("syncPolicy.decide")||!sync.includes("syncPolicy.ACTIONS"))throw new Error("production sync must use the shared conflict policy");
 for(const token of ["flowType: \"pkce\"","toolbox:data-changed","lastSyncedHash","lastSyncedRevision","SYNC_CONFLICT","开始同步","本机和云端"]){
   if(!sync.includes(token))throw new Error(`sync layer missing token: ${token}`);
 }
@@ -76,7 +88,7 @@ if(!sync.includes("enabled:false")||!sync.includes("不会先上传本机数据"
 if(!diagnostics.includes("if (!config.debugMode) return")||!diagnostics.includes("开发者连接自检"))throw new Error("Supabase setup must remain developer-only");
 
 if(fs.existsSync("supabase/schema.sql"))throw new Error("database schema must live in versioned migrations, not a second schema.sql source");
-if(!fs.existsSync(migrationPath))throw new Error("cloud migration is missing");
+if(JSON.stringify(migrations)!==JSON.stringify(expectedMigrations))throw new Error(`migration history drift: ${migrations.join(", ")}`);
 if(!/enable row level security/i.test(migration)||!migration.includes("auth.uid()")||!/security invoker/i.test(migration))throw new Error("cloud migration must enforce authenticated per-user RLS");
 if(!migration.includes("expected_revision")||!migration.includes("sync_conflict"))throw new Error("cloud writes need optimistic concurrency protection");
 if(!migration.includes("on delete cascade"))throw new Error("deleting an auth user should cascade to synced Toolbox data");
@@ -88,4 +100,4 @@ if(/SUPABASE_SECRET_KEYS|sb_secret_|service_role/.test(deleteAccount))throw new 
 if(!deleteAccountDeno.includes('"@supabase/server": "npm:@supabase/server"'))throw new Error("Edge Function dependency map is missing");
 if(!gitignore.includes("supabase/functions/.env")||!gitignore.includes("supabase/.temp/"))throw new Error("local Supabase secrets/state must be ignored");
 
-console.log(`ok: ${ids.length} methods, guest-first auth, optional sync, calibration, migrations and account lifecycle enabled`);
+console.log(`ok: ${ids.length} methods, guest-first auth, shared sync policy, calibration, aligned migrations and account lifecycle enabled`);
