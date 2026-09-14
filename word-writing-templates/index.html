@@ -2,14 +2,138 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Word 结构化思考与写作模板选择向导：选用途、编号和系统，直接下载适合你的模板。" />
-  <meta name="theme-color" content="#f6f7f9" />
-  <title>Word 结构化思考与写作模板选择向导</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="用 Word 标题层级组织思路，用导航窗格看清全文结构。选择适合你的中文 Word 写作模板，下载后双击即可使用。" />
+  <meta name="theme-color" content="#f7f5ef" />
+  <title>Word 结构化思考与写作</title>
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <main id="app"></main>
+  <a class="skip" href="#chooser">跳到模板选择</a>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="Word 结构化思考与写作首页">
+      <span class="brand-mark">W</span>
+      <span><strong>Word 结构化思考与写作</strong><small>打开就能开始</small></span>
+    </a>
+    <a class="top-link" href="#how">怎么用</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">思考 → 结构 → 写作 → 排版</p>
+        <h1>用 Word 整理思路，<br />也把文章写完。</h1>
+        <p class="lead">标题层级让思路有结构，导航窗格让结构一直可见、可检查、可调整。目录、页码、摘要、参考文献等已经准备好，需要时再用。</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#chooser">帮我选模板</a>
+          <a class="btn quiet" id="quickPackage" href="#chooser">直接下载整包</a>
+        </div>
+        <p class="micro">不用安装插件，不用开启宏，也不需要懂 Word 多级列表。</p>
+      </div>
+      <div class="thought-card" aria-label="标题层级示意">
+        <div class="tree-title">一眼看到全文结构</div>
+        <div class="tree-row level-1"><span>1</span><b>为什么要研究这个问题</b></div>
+        <div class="tree-row level-2"><span>1.1</span><b>问题从哪里来</b></div>
+        <div class="tree-row level-2 active"><span>1.2</span><b>真正的矛盾是什么</b></div>
+        <div class="tree-row level-3"><span>1.2.1</span><b>证据与例子</b></div>
+        <div class="tree-row level-1"><span>2</span><b>可以怎样解决</b></div>
+        <p>写着写着觉得乱，就先只看标题。哪里重复、哪里缺了一层、顺序是否合理，会更容易发现。</p>
+      </div>
+    </section>
+
+    <section class="chooser-wrap" id="chooser">
+      <div class="section-head">
+        <p class="eyebrow">30 秒选好</p>
+        <h2>选一个适合你的模板</h2>
+        <p>只回答 3 个问题。选完直接下载，不需要登录。</p>
+      </div>
+
+      <div class="chooser">
+        <section class="step" id="stepType">
+          <div class="step-head"><span class="step-no">1</span><div><h3>你准备写什么？</h3><p>选最接近的用途就好。</p></div></div>
+          <div class="choice-grid two" id="typeChoices">
+            <button class="choice" type="button" data-type="book" aria-pressed="false"><span class="icon">📚</span><strong>写书</strong><small>专著、教材、教程、长篇作品</small></button>
+            <button class="choice" type="button" data-type="article" aria-pressed="false"><span class="icon">📄</span><strong>写文章</strong><small>论文、报告、研究、正式文章</small></button>
+          </div>
+        </section>
+
+        <section class="step locked" id="stepScheme" aria-disabled="true">
+          <div class="step-head"><span class="step-no">2</span><div><h3>你喜欢哪种章节编号？</h3><p>直接看效果选，不需要理解规则。</p></div></div>
+          <div class="scheme-grid" id="schemeChoices"><div class="placeholder">先选“写书”或“写文章”。</div></div>
+        </section>
+
+        <section class="step locked" id="stepOs" aria-disabled="true">
+          <div class="step-head"><span class="step-no">3</span><div><h3>你在哪台电脑上使用 Word？</h3><p id="osHint">我们会匹配常用中文字体和快捷键。</p></div></div>
+          <div class="choice-grid two" id="osChoices">
+            <button class="choice" type="button" data-os="windows" aria-pressed="false"><span class="icon">▣</span><strong>Windows</strong><small>宋体、黑体、微软雅黑等</small></button>
+            <button class="choice" type="button" data-os="macos" aria-pressed="false"><span class="icon">⌘</span><strong>macOS / MacBook</strong><small>Songti SC、PingFang SC 等</small></button>
+          </div>
+        </section>
+
+        <section class="result" id="result" hidden aria-live="polite">
+          <div class="result-copy">
+            <p class="eyebrow">选好了</p>
+            <h3 id="resultTitle"></h3>
+            <p class="number-example" id="resultExample"></p>
+            <p id="resultDesc"></p>
+            <div class="result-actions">
+              <a class="btn primary" id="templateDownload" href="#">下载这个模板</a>
+              <a class="btn quiet" id="packageDownload" href="#">下载整包</a>
+            </div>
+            <p class="micro">下载 `.dotx` 后双击，Word 会据此创建一份新的文档，原模板不会被改动。</p>
+            <button class="reset" id="resetBtn" type="button">重新选择</button>
+          </div>
+          <div class="preview"><img id="resultImage" alt="所选编号方式预览" /></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="value" id="how">
+      <div class="section-head compact">
+        <p class="eyebrow">真正重要的不是排版</p>
+        <h2>把思路变成看得见的结构</h2>
+        <p>标题不是装饰。给一段内容起标题、决定它属于哪一层，本身就在帮助你归类、命名、排序和判断关系。</p>
+      </div>
+      <div class="value-grid">
+        <article><span>01</span><h3>先写下想法</h3><p>不用先把完整大纲想好。先写一个主题，再写几个一级标题。</p></article>
+        <article><span>02</span><h3>不断拆分层级</h3><p>一个问题太大，就拆成标题 2、标题 3。层级会逐渐显出思路之间的关系。</p></article>
+        <article><span>03</span><h3>只看标题检查</h3><p>打开 Word 导航窗格，暂时忽略句子，只检查并列、缺口、重复和顺序。</p></article>
+        <article><span>04</span><h3>再回去继续写</h3><p>结构调整后继续展开正文。同一份文件从想法一直长成最终文稿。</p></article>
+      </div>
+    </section>
+
+    <section class="ready">
+      <div class="section-head compact">
+        <p class="eyebrow">需要时自然接上</p>
+        <h2>成稿需要的东西，也已经在文件里</h2>
+        <p>不用一开始就管它们。等真正需要时再填写、更新或使用。</p>
+      </div>
+      <div class="pill-grid">
+        <span>自动多级编号</span><span>目录</span><span>页码</span><span>作者信息</span><span>前言 / 摘要</span><span>题注与交叉引用</span><span>脚注 / 尾注</span><span>参考文献样式</span>
+      </div>
+    </section>
+
+    <section class="start">
+      <div class="start-card">
+        <div><p class="eyebrow">第一次使用</p><h2>下载 → 双击 → 开始写</h2><p>最开始只需要认识“标题 1 / 标题 2”和正文。写一会儿后打开导航窗格，看一眼全文结构。</p></div>
+        <a class="btn primary" href="#chooser">现在选模板</a>
+      </div>
+    </section>
+
+    <section class="faq">
+      <div class="section-head compact"><h2>常见问题</h2></div>
+      <details><summary>我不会 Word 样式，可以用吗？</summary><p>可以。模板已经预置标题层级、编号和正文样式。你可以从 Word 的“样式”区域选择标题 1、标题 2，也可以使用模板提供的快捷键。</p></details>
+      <details><summary>前言、摘要、目录暂时不用怎么办？</summary><p>先放着即可，不会妨碍正文写作；不需要的文字内容也可以删除。它们采用不会挤进核心标题树的结构方式。</p></details>
+      <details><summary>导航窗格有什么用？</summary><p>它会持续显示文档中的标题层级，让你不必来回翻几十页就能看到全局结构。在支持拖动重排的 Word 桌面版本中，还可以直接调整文档部分的位置。</p></details>
+      <details><summary>需要安装宏或插件吗？</summary><p>不需要。模板使用 Word 原生 `.dotx` 格式，不包含 VBA 宏。</p></details>
+    </section>
+  </main>
+
+  <footer>
+    <span>Word 结构化思考与写作模板</span>
+    <span class="footer-links"><a href="https://github.com/SeekerThinker/word-writing-templates" rel="noreferrer">开源项目</a><a href="https://github.com/SeekerThinker/word-writing-templates/releases/latest" rel="noreferrer">版本说明</a></span>
+  </footer>
+
   <script src="./app.js"></script>
 </body>
 </html>
