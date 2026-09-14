@@ -1,6 +1,7 @@
 (() => {
   "use strict";
 
+  const SHARE_CACHE = "toolbox-share-inbox-v1";
   const clean = value => String(value || "").replace(/\s+/g, " ").trim();
   const params = new URLSearchParams(window.location.search);
   const mode = params.get("capture");
@@ -9,25 +10,34 @@
   const input = document.querySelector("#taskInput");
   if (!input) return;
 
-  if (mode === "share") {
-    const values = [params.get("title"), params.get("text"), params.get("url")]
-      .map(clean)
-      .filter(Boolean);
-    const unique = values.filter((value, index) =>
-      !values.some((other, otherIndex) => otherIndex < index && (other.includes(value) || value.includes(other)))
-    );
-    const shared = unique.join(" — ").slice(0, 3000);
-    if (shared) {
-      input.value = shared;
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-      if (window.Toolbox && typeof Toolbox.toast === "function") Toolbox.toast("已带入分享内容，确认后添加");
+  const consumeSharedDraft = async () => {
+    if (mode !== "shared" || !("caches" in window)) return "";
+    const inbox = await caches.open(SHARE_CACHE);
+    const key = new URL("./__share_payload__", window.location.href).href;
+    const response = await inbox.match(key);
+    if (!response) return "";
+    await inbox.delete(key);
+    return clean(await response.text()).slice(0, 3000);
+  };
+
+  const finish = () => {
+    input.focus({ preventScroll: true });
+    input.scrollIntoView({ behavior: "smooth", block: "center" });
+    const current = new URL(window.location.href);
+    for (const key of ["capture", "title", "text", "url"]) current.searchParams.delete(key);
+    window.history.replaceState(null, "", current.pathname + current.search + current.hash);
+  };
+
+  (async () => {
+    try {
+      const shared = await consumeSharedDraft();
+      if (shared) {
+        input.value = shared;
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+        if (window.Toolbox && typeof Toolbox.toast === "function") Toolbox.toast("已带入分享内容，确认后添加");
+      }
+    } finally {
+      finish();
     }
-  }
-
-  input.focus({ preventScroll: true });
-  input.scrollIntoView({ behavior: "smooth", block: "center" });
-
-  const current = new URL(window.location.href);
-  for (const key of ["capture", "title", "text", "url"]) current.searchParams.delete(key);
-  window.history.replaceState(null, "", current.pathname + current.search + current.hash);
+  })();
 })();
