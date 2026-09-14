@@ -13,6 +13,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check core.js
+          node --check cloud-public.js
           node --check cloud-config.js
           node --check sync.js
           node --check account-lifecycle.js
