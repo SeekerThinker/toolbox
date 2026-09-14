@@ -2,6 +2,7 @@
   "use strict";
 
   const { storage, $, escapeHtml, openPanel, toast, download } = Toolbox;
+  const syncPolicy = globalThis.ToolboxSyncPolicy;
   const META_KEY = "toolbox:sync:v1";
   const SDK_URL = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/+esm";
   const config = window.ToolboxCloudConfig || {};
@@ -158,44 +159,56 @@
   const syncNow = async ({ background=false }={}) => {
     const meta = readMeta();
     if (!meta.enabled) return { skipped:true };
+
     const session = activeSession || await refreshSession();
     if (!session) return { skipped:true };
+    if (!syncPolicy?.decide || !syncPolicy?.ACTIONS) throw new Error("同步策略未加载，请刷新页面");
 
     const localPayload = storage.snapshot();
     const localHash = await hashPayload(localPayload);
     const remote = await fetchRemote();
+    const remoteRevision = Number(remote?.revision) || 0;
+    const hasBaseline = Boolean(meta.lastSyncedHash && meta.lastSyncedRevision);
+    const localChanged = hasBaseline ? localHash !== meta.lastSyncedHash : false;
+    const remoteChanged = hasBaseline ? remoteRevision !== Number(meta.lastSyncedRevision) : false;
 
-    if (!remote) return pushLocal(0);
+    const action = syncPolicy.decide({
+      enabled:meta.enabled,
+      hasSession:true,
+      hasRemote:Boolean(remote),
+      hasBaseline,
+      localChanged,
+      remoteChanged,
+      background
+    });
 
-    const remoteRevision = Number(remote.revision) || 0;
-    if (!meta.lastSyncedHash || !meta.lastSyncedRevision) {
-      lastConflict = { remote, localHash, reason:"first" };
-      writeMeta({ lastError:"首次同步需要选择数据来源" });
-      return { conflict:lastConflict };
-    }
-
-    const localChanged = localHash !== meta.lastSyncedHash;
-    const remoteChanged = remoteRevision !== Number(meta.lastSyncedRevision);
-
-    if (!localChanged && !remoteChanged) {
-      writeMeta({ lastSyncAt:Date.now(), lastError:null });
-      return { direction:"none" };
-    }
-
-    if (!localChanged && remoteChanged) {
-      if (background) {
+    switch (action) {
+      case syncPolicy.ACTIONS.SKIP:
+        return { skipped:true };
+      case syncPolicy.ACTIONS.UPLOAD_NEW:
+        return pushLocal(0);
+      case syncPolicy.ACTIONS.CONFLICT_FIRST:
+        lastConflict = { remote, localHash, reason:"first" };
+        writeMeta({ lastError:"首次同步需要选择数据来源" });
+        return { conflict:lastConflict };
+      case syncPolicy.ACTIONS.NOOP:
+        writeMeta({ lastSyncAt:Date.now(), lastError:null });
+        return { direction:"none" };
+      case syncPolicy.ACTIONS.RESTORE_REMOTE:
+        return applyRemote(remote);
+      case syncPolicy.ACTIONS.CONFLICT_REMOTE_NEWER:
         lastConflict = { remote, localHash, reason:"remote-newer" };
         writeMeta({ lastError:"云端有更新，打开账号确认后恢复" });
         return { conflict:lastConflict };
-      }
-      return applyRemote(remote);
+      case syncPolicy.ACTIONS.UPLOAD_LOCAL:
+        return pushLocal(remoteRevision);
+      case syncPolicy.ACTIONS.CONFLICT_BOTH:
+        lastConflict = { remote, localHash, reason:"both" };
+        writeMeta({ lastError:"本机和云端都已修改，需要选择" });
+        return { conflict:lastConflict };
+      default:
+        throw new Error("无法判断同步状态");
     }
-
-    if (localChanged && !remoteChanged) return pushLocal(remoteRevision);
-
-    lastConflict = { remote, localHash, reason:"both" };
-    writeMeta({ lastError:"本机和云端都已修改，需要选择" });
-    return { conflict:lastConflict };
   };
 
   const scheduleSync = () => {
