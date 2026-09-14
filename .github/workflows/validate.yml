@@ -31,6 +31,7 @@ jobs:
           node --check tests/auth-surface.mjs
           node --check tests/auth-email.mjs
           node --check tests/product-scope.mjs
+          node --check tests/usability-safety.mjs
       - name: Run smoke checks
         run: |
           node tests/smoke.mjs
@@ -39,6 +40,7 @@ jobs:
           node tests/auth-surface.mjs
           node tests/auth-email.mjs
           node tests/product-scope.mjs
+          node tests/usability-safety.mjs
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
