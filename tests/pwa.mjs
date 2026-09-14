@@ -25,19 +25,21 @@ if (!pwa.includes("beforeinstallprompt") || !pwa.includes('navigator.serviceWork
 
 const quickCapture = (manifest.shortcuts || []).find(shortcut => shortcut.url === "./?capture=1");
 if (!quickCapture || !quickCapture.name.includes("待办")) throw new Error("PWA quick-capture shortcut is missing");
-if (manifest.share_target?.action !== "./?capture=share" || manifest.share_target?.method !== "GET") throw new Error("PWA share target is missing or unsafe");
+if (manifest.share_target?.action !== "./share-target" || manifest.share_target?.method !== "POST" || manifest.share_target?.enctype !== "multipart/form-data") throw new Error("PWA share target must use a private POST handoff");
 for (const key of ["title", "text", "url"]) {
   if (manifest.share_target?.params?.[key] !== key) throw new Error(`share target missing ${key}`);
 }
-for (const token of ['params.get("capture")', 'mode === "share"', '#taskInput', "history.replaceState", "确认后添加"]) {
+for (const token of ['params.get("capture")', 'mode !== "shared"', 'toolbox-share-inbox-v1', '#taskInput', "history.replaceState", "确认后添加"]) {
   if (!capture.includes(token)) throw new Error(`capture handler missing token: ${token}`);
 }
-if (/\.click\(\)|storage\.set|addTask/i.test(capture)) throw new Error("shared content must be confirmed before creating a task");
+if (/params\.get\("(?:title|text|url)"\)|\.click\(\)|storage\.set|addTask/i.test(capture)) throw new Error("shared content must not travel in URL params or auto-create a task");
 
-if (!sw.includes("toolbox-shell-v4") || !sw.includes("request.mode === \"navigate\"") || !sw.includes('"./capture.js"') || !sw.includes('"./sync-policy.js"')) throw new Error("offline app shell is incomplete");
+for (const token of ["toolbox-shell-v5", "toolbox-share-inbox-v1", 'request.method === "POST"', 'url.pathname.endsWith("/share-target")', "request.formData()", "SHARE_ENTRY", '"./capture.js"', '"./sync-policy.js"']) {
+  if (!sw.includes(token)) throw new Error(`service worker missing token: ${token}`);
+}
 for (const file of ["cloud-public.js", "cloud-config.js"]) {
   if (!sw.includes(`url.pathname.endsWith("/${file}")`) || !sw.includes(`"./${file}"`)) throw new Error(`${file} must be cached but refreshed network-first`);
 }
 if (!sw.includes("networkFirst(request)") || !sw.includes("url.origin !== self.location.origin")) throw new Error("service worker network safety is incomplete");
 
-console.log("ok: installable PWA, offline cache, shared sync policy, quick capture, safe share target and fresh auth config enabled");
+console.log("ok: installable PWA, offline cache, quick capture and privacy-safe local share handoff enabled");
