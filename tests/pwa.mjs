@@ -6,12 +6,15 @@ const pwa = fs.readFileSync("pwa.js", "utf8");
 const capture = fs.readFileSync("capture.js", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 
-for (const file of ["manifest.webmanifest", "pwa.js", "capture.js", "sw.js", "pwa-icon-192.svg", "pwa-icon-512.svg"]) {
+for (const file of ["manifest.webmanifest", "pwa.js", "capture.js", "sw.js", "sync-policy.js", "pwa-icon-192.svg", "pwa-icon-512.svg"]) {
   if (!fs.existsSync(file)) throw new Error(`missing PWA asset: ${file}`);
 }
 
 if (!index.includes('rel="manifest" href="./manifest.webmanifest"')) throw new Error("manifest is not linked from index");
 if (!index.includes('src="./pwa.js"') || !index.includes('src="./capture.js"')) throw new Error("PWA bootstrap or capture handler is not loaded");
+const policyIndex = index.indexOf('src="./sync-policy.js"');
+const syncIndex = index.indexOf('src="./sync.js"');
+if (policyIndex < 0 || syncIndex < 0 || policyIndex > syncIndex) throw new Error("sync policy must load before sync.js");
 if (manifest.name !== "Toolbox" || manifest.short_name !== "Toolbox") throw new Error("PWA brand must remain Toolbox");
 if (manifest.start_url !== "./" || manifest.scope !== "./") throw new Error("PWA must stay inside the GitHub Pages subpath");
 if (manifest.display !== "standalone") throw new Error("PWA should launch as a standalone app");
@@ -31,10 +34,10 @@ for (const token of ['params.get("capture")', 'mode === "share"', '#taskInput', 
 }
 if (/\.click\(\)|storage\.set|addTask/i.test(capture)) throw new Error("shared content must be confirmed before creating a task");
 
-if (!sw.includes("toolbox-shell-v3") || !sw.includes("request.mode === \"navigate\"") || !sw.includes('"./capture.js"')) throw new Error("offline app shell is incomplete");
+if (!sw.includes("toolbox-shell-v4") || !sw.includes("request.mode === \"navigate\"") || !sw.includes('"./capture.js"') || !sw.includes('"./sync-policy.js"')) throw new Error("offline app shell is incomplete");
 for (const file of ["cloud-public.js", "cloud-config.js"]) {
   if (!sw.includes(`url.pathname.endsWith("/${file}")`) || !sw.includes(`"./${file}"`)) throw new Error(`${file} must be cached but refreshed network-first`);
 }
 if (!sw.includes("networkFirst(request)") || !sw.includes("url.origin !== self.location.origin")) throw new Error("service worker network safety is incomplete");
 
-console.log("ok: installable PWA, offline cache, quick capture, safe share target and fresh auth config enabled");
+console.log("ok: installable PWA, offline cache, shared sync policy, quick capture, safe share target and fresh auth config enabled");
