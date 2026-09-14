@@ -43,8 +43,7 @@
       <section class="hero">
         <p class="eyebrow">思考 → 结构 → 写作 → 排版</p>
         <h1>让思路有层级，让结构可调整，让想法直接长成文章</h1>
-        <p class="hero-copy">标题层级把思考结构显出来；Word 导航窗格让你随时检查、重组全文。模板同时准备好作者、摘要、目录、页码、参考文献等成稿结构，但你开始时完全可以先不管它们。</p>
-        <p class="hero-note"><strong>v4 只有一套模板。</strong> 不再区分“直接开始版 / 带常用结构版”。暂时不用的区块可以保留，需要时填写，不需要时删除。</p>
+        <p class="hero-copy">标题层级把思考结构显出来；Word 导航窗格让你随时检查、重组全文。作者、摘要、目录、页码、参考文献等常用结构已经预置，需要时再用即可。</p>
         <div class="hero-badges"><span>✓ Windows / macOS</span><span>✓ 双击即用</span><span>✓ 导航窗格思考树</span><span>✓ 无宏</span></div>
       </section>
 
@@ -77,7 +76,7 @@
             <p class="number-example" id="resultExample"></p>
             <p id="resultDesc"></p>
             <p><strong>先写正文即可：</strong>需要拆分时用“标题 2 / 3 / 4”；写一会儿后打开导航窗格，只看标题检查并列、缺口、重复和顺序。</p>
-            <p><strong>成稿结构已经在同一份文件里：</strong>暂时不用的作者、前言、摘要、目录、附录或参考文献可以先留着，也可以删除。</p>
+            <p>作者、前言、摘要、目录、附录或参考文献等区块不用时可以先留着，需要时再填写。</p>
             <div class="result-actions">
               <a class="btn primary" id="templateDownload" href="#">下载这个 .dotx 模板</a>
               <a class="btn secondary" id="packageDownload" href="#">下载整包</a>
@@ -98,16 +97,7 @@
         <details><summary>我需要先学会页码、目录和参考文献吗？</summary><p>不需要。最开始只认识“标题 1 / 标题 2”和正文就够了。页码、题注、脚注、参考文献等功能是为了以后减少排版摩擦，不是开始思考和写作的前置条件。</p></details>
       </section>
 
-      <section class="feedback-panel">
-        <div class="feedback-copy"><h2>在真实 Word 里用过？</h2><p>真实使用反馈能帮助项目确认不同 Word 版本的体验。完全可选，不需要上传你的写作内容。</p></div>
-        <div class="feedback-actions">
-          <a class="btn secondary" href="${PROJECT}/issues/new?template=word_quick_success.yml" target="_blank" rel="noreferrer">几十秒：使用正常 ↗</a>
-          <a class="btn secondary" href="${PROJECT}/issues/new?template=word_compatibility_report.yml" target="_blank" rel="noreferrer">3～5 分钟：完整验证 ↗</a>
-          <a class="feedback-record" href="${PROJECT}/blob/main/docs/兼容性验证记录.md" target="_blank" rel="noreferrer">查看公开兼容性记录 ↗</a>
-        </div>
-      </section>
-
-      <footer class="footer"><span>Toolbox 只负责选择与索引；模板源码、Release 和反馈留在独立项目。</span><span><a href="${PROJECT}" target="_blank" rel="noreferrer">GitHub 项目 ↗</a></span></footer>
+      <footer class="footer"><span>Toolbox 只负责选择与索引；模板源码和 Release 留在独立项目。</span><span><a href="${PROJECT}" target="_blank" rel="noreferrer">GitHub 项目 ↗</a></span></footer>
     </div>`;
 
   const el = {
