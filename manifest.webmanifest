@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Toolbox",
   "short_name": "Toolbox",
-  "description": "以待办为核心的个人思考与执行系统。",
+  "description": "从一件待办出发，记录、思考、专注、复盘，并在多端持续推进。",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",
