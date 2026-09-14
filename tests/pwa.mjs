@@ -6,16 +6,16 @@ const pwa = fs.readFileSync("pwa.js", "utf8");
 const capture = fs.readFileSync("capture.js", "utf8");
 const sw = fs.readFileSync("sw.js", "utf8");
 
-for (const file of ["manifest.webmanifest", "pwa.js", "capture.js", "sw.js", "sync-policy.js", "readability.css", "pwa-icon-192.svg", "pwa-icon-512.svg"]) {
+for (const file of ["manifest.webmanifest", "pwa.js", "capture.js", "sw.js", "readability.css", "pwa-icon-192.svg", "pwa-icon-512.svg"]) {
   if (!fs.existsSync(file)) throw new Error(`missing PWA asset: ${file}`);
 }
 
 if (!index.includes('rel="manifest" href="./manifest.webmanifest"')) throw new Error("manifest is not linked from index");
 if (!index.includes('href="./readability.css"')) throw new Error("readability refinements are not linked from index");
 if (!index.includes('src="./pwa.js"') || !index.includes('src="./capture.js"')) throw new Error("PWA bootstrap or capture handler is not loaded");
-const policyIndex = index.indexOf('src="./sync-policy.js"');
-const syncIndex = index.indexOf('src="./sync.js"');
-if (policyIndex < 0 || syncIndex < 0 || policyIndex > syncIndex) throw new Error("sync policy must load before sync.js");
+for (const dormant of ["cloud-public.js","cloud-config.js","sync-policy.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","cloud.css"]) {
+  if (index.includes(`./${dormant}`)) throw new Error(`guest runtime must not load dormant cloud asset: ${dormant}`);
+}
 if (manifest.name !== "Toolbox" || manifest.short_name !== "Toolbox") throw new Error("PWA brand must remain Toolbox");
 if (manifest.start_url !== "./" || manifest.scope !== "./") throw new Error("PWA must stay inside the GitHub Pages subpath");
 if (manifest.display !== "standalone") throw new Error("PWA should launch as a standalone app");
@@ -35,12 +35,12 @@ for (const token of ['params.get("capture")', 'mode !== "shared"', 'toolbox-shar
 }
 if (/params\.get\("(?:title|text|url)"\)|\.click\(\)|storage\.set|addTask/i.test(capture)) throw new Error("shared content must not travel in URL params or auto-create a task");
 
-for (const token of ["toolbox-shell-v6", "toolbox-share-inbox-v1", 'request.method === "POST"', 'url.pathname.endsWith("/share-target")', "request.formData()", "SHARE_ENTRY", '"./readability.css"', '"./capture.js"', '"./sync-policy.js"']) {
+for (const token of ["toolbox-shell-v7", "toolbox-share-inbox-v1", 'request.method === "POST"', 'url.pathname.endsWith("/share-target")', "request.formData()", "SHARE_ENTRY", '"./readability.css"', '"./capture.js"']) {
   if (!sw.includes(token)) throw new Error(`service worker missing token: ${token}`);
 }
-for (const file of ["cloud-public.js", "cloud-config.js"]) {
-  if (!sw.includes(`url.pathname.endsWith("/${file}")`) || !sw.includes(`"./${file}"`)) throw new Error(`${file} must be cached but refreshed network-first`);
+for (const dormant of ["cloud-public.js","cloud-config.js","sync-policy.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","cloud.css"]) {
+  if (sw.includes(`"./${dormant}"`)) throw new Error(`guest app shell must not cache dormant cloud asset: ${dormant}`);
 }
 if (!sw.includes("networkFirst(request)") || !sw.includes("url.origin !== self.location.origin")) throw new Error("service worker network safety is incomplete");
 
-console.log("ok: installable PWA, readable offline shell, quick capture and privacy-safe local share handoff enabled");
+console.log("ok: installable local-only PWA, offline shell, quick capture and privacy-safe share handoff enabled");
