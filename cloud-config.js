@@ -21,6 +21,7 @@
     publishableKey: deployedKey || debugKey,
     emailOtp: publicConfig.emailOtp !== false,
     wechatProvider: /^custom:[a-z0-9:-]+$/.test(publicConfig.wechatProvider || "") ? publicConfig.wechatProvider : "",
+    accountDeletionEnabled: publicConfig.accountDeletionEnabled === true,
     debugMode,
     runtimeKeyStorage: RUNTIME_KEY
   });
