@@ -1,19 +1,27 @@
 (() => {
   "use strict";
 
+  const publicConfig = window.ToolboxPublicCloudConfig || {};
+  const debugMode = new URLSearchParams(window.location.search).get("debug") === "cloud";
   const RUNTIME_KEY = "toolbox:supabase:publishable-key";
-  let runtimeKey = "";
-  try {
-    runtimeKey = localStorage.getItem(RUNTIME_KEY) || "";
-  } catch {}
+  let debugKey = "";
 
-  if (!/^sb_publishable_/.test(runtimeKey)) runtimeKey = "";
+  if (debugMode) {
+    try {
+      debugKey = localStorage.getItem(RUNTIME_KEY) || "";
+    } catch {}
+    if (!/^sb_publishable_/.test(debugKey)) debugKey = "";
+  }
+
+  const deployedKey = /^sb_publishable_/.test(publicConfig.publishableKey || "") ? publicConfig.publishableKey : "";
 
   window.ToolboxCloudConfig = Object.freeze({
     provider: "supabase",
     url: "https://bmclrtrtzntzrhudwisv.supabase.co",
-    publishableKey: runtimeKey,
-    oauthProviders: ["github"],
+    publishableKey: deployedKey || debugKey,
+    emailOtp: publicConfig.emailOtp !== false,
+    wechatProvider: /^custom:[a-z0-9:-]+$/.test(publicConfig.wechatProvider || "") ? publicConfig.wechatProvider : "",
+    debugMode,
     runtimeKeyStorage: RUNTIME_KEY
   });
 })();
