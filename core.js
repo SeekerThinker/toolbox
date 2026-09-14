@@ -146,13 +146,13 @@
   };
   const categories = () => {
     const present=new Set([...tools.values()].map(t=>t.category));
-    return ["全部",...CATEGORY_ORDER.filter(x=>present.has(x)),"收藏"];
+    return ["全部",...CATEGORY_ORDER.filter(x=>present.has(x))];
   };
   const filteredTools = () => {
     const query=state.query.trim().toLowerCase();let source=orderedTools();
     if(state.category==="最近")source=state.recent.map(id=>tools.get(id)).filter(Boolean);
     return source.filter(tool=>{
-      const categoryOk=state.category==="全部"||state.category==="最近"||(state.category==="收藏"?state.favorites.has(tool.id):tool.category===state.category);
+      const categoryOk=state.category==="全部"||state.category==="最近"||tool.category===state.category;
       const haystack=`${tool.name} ${tool.desc} ${tool.keywords||""} ${tool.category}`.toLowerCase();
       return categoryOk&&(!query||haystack.includes(query));
     });
@@ -160,11 +160,10 @@
   const renderTabs = () => { ui.tabs.innerHTML=categories().map(category=>`<button class="chip ${state.category===category?"active":""}" data-category="${escapeHtml(category)}" type="button">${escapeHtml(category)}</button>`).join(""); };
   const render = () => {
     renderTabs();const list=filteredTools();
-    ui.sectionTitle.textContent=state.category==="全部"?"方法工具":state.category==="收藏"?"我的收藏":state.category==="最近"?"最近使用":state.category;
+    ui.sectionTitle.textContent=state.category==="全部"?"方法工具":state.category==="最近"?"最近使用":state.category;
     ui.resultCount.textContent=`${list.length} 个`;ui.empty.hidden=list.length>0;
-    ui.grid.innerHTML=list.map(tool=>`<article class="tool-card"><button class="tool-main" data-id="${escapeHtml(tool.id)}" type="button"><span class="tool-icon">${escapeHtml(tool.icon)}</span><h3>${escapeHtml(tool.name)}</h3><p>${escapeHtml(tool.desc)}</p><span class="tag">${escapeHtml(tool.category)}</span></button><button class="favorite ${state.favorites.has(tool.id)?"on":""}" data-fav="${escapeHtml(tool.id)}" type="button">★</button></article>`).join("");
+    ui.grid.innerHTML=list.map(tool=>`<article class="tool-card"><button class="tool-main" data-id="${escapeHtml(tool.id)}" type="button"><span class="tool-icon">${escapeHtml(tool.icon)}</span><h3>${escapeHtml(tool.name)}</h3><p>${escapeHtml(tool.desc)}</p><span class="tag">${escapeHtml(tool.category)}</span></button></article>`).join("");
   };
-  const setFavorite = id => {state.favorites.has(id)?state.favorites.delete(id):state.favorites.add(id);storage.set("favorites",[...state.favorites]);render();};
   const cleanupActiveTool = () => {try{activeCleanup?.();}catch(error){console.warn("tool cleanup failed",error);}activeCleanup=null;document.title="Toolbox";};
   const prepareDialog = ({icon,title,desc,local=true}) => {cleanupActiveTool();ui.dialogIcon.textContent=icon;ui.dialogTitle.textContent=title;ui.dialogDesc.textContent=desc;ui.localBadge.hidden=!local;ui.mount.innerHTML="";};
   const openPanel = (meta,renderer) => {
@@ -193,7 +192,7 @@
     $("[data-save-result]",bar).onclick=()=>{
       const outputs=[...ui.mount.querySelectorAll(".output-panel")].map(x=>x.textContent.trim()).filter(x=>x&&x.length>8);
       const content=outputs.at(-1)||"";
-      if(!content){toast("先生成分析结果");return;}
+      if(!content){toast("先整理出结果");return;}
       addTaskActivity(task.id,tool,content);toast("已保存到待办");
     };
     $("[data-back-task]",bar).onclick=()=>window.Toolbox.openTask?.(task.id);
@@ -206,26 +205,24 @@
   };
   const openDataPanel = () => {
     openPanel({icon:"↥",title:"数据备份",desc:"导出或恢复待办、分析、专注历史和偏好。"},root=>{
-      root.innerHTML=`<div class="editor-stack"><div class="output-panel">数据默认保存在当前浏览器。导出 JSON 可备份或迁移；未来账号同步也沿用同一数据结构。</div><div class="toolbar"><button id="exportDataBtn" class="primary-btn" type="button">导出全部数据</button></div><hr class="divider"><div class="field"><label>恢复备份</label><input id="importDataFile" class="file-drop" type="file" accept="application/json,.json"></div><button id="importDataBtn" class="secondary-btn" type="button">导入并覆盖当前数据</button><div id="dataBackupStatus" class="output-panel">导入后页面会重新载入。</div></div>`;
+      root.innerHTML=`<div class="editor-stack"><div class="output-panel">数据默认保存在当前浏览器。导出 JSON 可备份或迁移到另一个浏览器。</div><div class="toolbar"><button id="exportDataBtn" class="primary-btn" type="button">导出全部数据</button></div><hr class="divider"><div class="field"><label>恢复备份</label><input id="importDataFile" class="file-drop" type="file" accept="application/json,.json"></div><button id="importDataBtn" class="secondary-btn" type="button">导入并覆盖当前数据</button><div id="dataBackupStatus" class="output-panel">导入前会再次确认；成功后页面会重新载入。</div></div>`;
       $("#exportDataBtn",root).onclick=()=>{const date=new Date().toISOString().slice(0,10);download(new Blob([storage.exportData()],{type:"application/json;charset=utf-8"}),`toolbox-backup-${date}.json`);toast("备份已导出");};
-      $("#importDataBtn",root).onclick=async()=>{const file=$("#importDataFile",root).files[0],status=$("#dataBackupStatus",root);if(!file){status.textContent="请先选择备份 JSON。";return;}try{storage.importData(await file.text());status.textContent="✓ 已恢复备份，正在重新载入。";setTimeout(()=>location.reload(),350);}catch(error){status.textContent=`导入失败：${error.message}`;}};
+      $("#importDataBtn",root).onclick=async()=>{const file=$("#importDataFile",root).files[0],status=$("#dataBackupStatus",root);if(!file){status.textContent="请先选择备份 JSON。";return;}if(!confirm("导入备份会覆盖当前浏览器里的全部 Toolbox 数据。继续吗？")){status.textContent="已取消导入，当前数据没有变化。";return;}try{storage.importData(await file.text());status.textContent="✓ 已恢复备份，正在重新载入。";setTimeout(()=>location.reload(),350);}catch(error){status.textContent=`导入失败：${error.message}`;}};
     });
   };
   const closeDialog = () => {if(ui.dialog.open)ui.dialog.close();};
 
   const start = () => {
     ui={grid:$("#toolGrid"),tabs:$("#categoryTabs"),search:$("#searchInput"),dialog:$("#toolDialog"),mount:$("#toolMount"),empty:$("#emptyState"),sectionTitle:$("#sectionTitle"),resultCount:$("#resultCount"),dialogIcon:$("#dialogIcon"),dialogTitle:$("#dialogTitle"),dialogDesc:$("#dialogDesc"),localBadge:$("#dialogLocalBadge")};
-    const savedFavorites=storage.get("favorites",[]),savedRecent=storage.get("recent",[]);
-    const validFavorites=Array.isArray(savedFavorites)?savedFavorites.filter(id=>tools.has(id)):[],validRecent=Array.isArray(savedRecent)?savedRecent.filter(id=>tools.has(id)).slice(0,8):[];
-    if(JSON.stringify(validFavorites)!==JSON.stringify(savedFavorites))storage.set("favorites",validFavorites);if(JSON.stringify(validRecent)!==JSON.stringify(savedRecent))storage.set("recent",validRecent);
-    state={category:"全部",query:"",favorites:new Set(validFavorites),recent:validRecent};
+    const savedRecent=storage.get("recent",[]),validRecent=Array.isArray(savedRecent)?savedRecent.filter(id=>tools.has(id)).slice(0,8):[];
+    if(JSON.stringify(validRecent)!==JSON.stringify(savedRecent))storage.set("recent",validRecent);
+    state={category:"全部",query:"",recent:validRecent};
     const savedTheme=storage.get("preferences.theme",null);if(savedTheme==="dark"||savedTheme==="light")document.documentElement.dataset.theme=savedTheme;
     ui.tabs?.addEventListener("click",event=>{const btn=event.target.closest("[data-category]");if(!btn)return;state.category=btn.dataset.category;render();});
-    ui.grid?.addEventListener("click",event=>{const fav=event.target.closest("[data-fav]");if(fav){setFavorite(fav.dataset.fav);return;}const opener=event.target.closest("[data-id]");if(opener)openTool(opener.dataset.id);});
+    ui.grid?.addEventListener("click",event=>{const opener=event.target.closest("[data-id]");if(opener)openTool(opener.dataset.id);});
     ui.search?.addEventListener("input",()=>{state.query=ui.search.value;render();});
     document.addEventListener("keydown",event=>{const tag=document.activeElement?.tagName;if(event.key==="/"&&!["INPUT","TEXTAREA","SELECT"].includes(tag)){event.preventDefault();ui.search?.focus();}if(event.key==="Escape"&&ui.dialog.open)closeDialog();});
     $("#recentBtn")?.addEventListener("click",()=>{state.category="最近";render();});
-    $("#favoritesBtn")?.addEventListener("click",()=>{state.category="收藏";render();});
     $("#dataBtn")?.addEventListener("click",event=>{event.preventDefault();openDataPanel();});
     $("#themeBtn")?.addEventListener("click",()=>{const next=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=next;storage.set("preferences.theme",next);});
     $("#closeDialogBtn")?.addEventListener("click",closeDialog);ui.dialog.addEventListener("click",event=>{if(event.target===ui.dialog)closeDialog();});ui.dialog.addEventListener("close",cleanupActiveTool);
