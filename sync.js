@@ -8,7 +8,6 @@
   const config = window.ToolboxCloudConfig || {};
   const configured = config.provider === "supabase" && /^https:\/\//.test(config.url || "") && /^sb_publishable_/.test(config.publishableKey || "");
   const emailOtpEnabled = config.emailOtp === true;
-  const wechatProvider = /^custom:[a-z0-9:-]+$/.test(config.wechatProvider || "") ? config.wechatProvider : "";
   let pendingEmail = "";
 
   const readMeta = () => {
@@ -236,21 +235,6 @@
   const formatTime = value => value ? new Date(value).toLocaleString() : "尚未同步";
   const validEmail = value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 
-  const startWechatLogin = async () => {
-    if (!wechatProvider) return;
-    try {
-      const client = await getClient();
-      sessionStorage.setItem("toolbox:auth-pending","1");
-      const { error } = await client.auth.signInWithOAuth({
-        provider: wechatProvider,
-        options: { redirectTo:`${location.origin}${location.pathname}` }
-      });
-      if (error) throw error;
-    } catch (error) {
-      toast(`微信登录失败：${error.message}`);
-    }
-  };
-
   const sendEmailOtp = async root => {
     const input = $("#syncEmailInput", root);
     const email = String(input?.value || "").trim();
@@ -333,10 +317,6 @@
       return;
     }
 
-    const wechatButton = wechatProvider
-      ? `<button id="syncWechatBtn" class="primary-btn" type="button">微信登录</button>`
-      : "";
-
     const emailBlock = emailOtpEnabled ? `
       <div class="task-capability-body" style="padding:0">
         <div class="field"><label for="syncEmailInput">邮箱登录</label><input id="syncEmailInput" class="text-input" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com"></div>
@@ -346,13 +326,10 @@
       </div>` : "";
 
     root.innerHTML = `<div class="editor-stack">
-      <div class="output-panel"><strong>当前：直接使用</strong><br>不登录也能完整使用 Toolbox。登录只用于跨设备同步，不会先上传本机数据。</div>
-      ${wechatButton ? `<div class="toolbar">${wechatButton}</div>` : ""}
-      ${wechatButton && emailBlock ? `<div class="help-text">或</div>` : ""}
+      <div class="output-panel"><strong>当前：直接使用</strong><br>不登录也能完整使用 Toolbox。邮箱登录只用于跨设备同步，不会先上传本机数据。</div>
       ${emailBlock}
     </div>`;
 
-    $("#syncWechatBtn", root)?.addEventListener("click", startWechatLogin);
     $("#syncSendOtpBtn", root)?.addEventListener("click", () => sendEmailOtp(root));
     $("#syncVerifyOtpBtn", root)?.addEventListener("click", () => verifyEmailOtp(root));
     $("#syncEmailInput", root)?.addEventListener("keydown", event => {
@@ -389,7 +366,7 @@
     }
 
     const meta = readMeta();
-    const who = session.user.email || session.user.user_metadata?.nickname || session.user.user_metadata?.name || session.user.id.slice(0,8);
+    const who = session.user.email || session.user.id.slice(0,8);
     root.innerHTML = `<div class="editor-stack">
       <div class="output-panel"><strong>${escapeHtml(who)}</strong><br>${meta.enabled?"已开启跨设备同步":"已登录，但尚未开启同步"}<br>上次同步：${escapeHtml(formatTime(meta.lastSyncAt))}${meta.lastError?`<br>状态：${escapeHtml(meta.lastError)}`:""}</div>
       <div class="toolbar"><button id="syncEnableBtn" class="primary-btn" type="button">${meta.enabled?"立即同步":"开始同步"}</button><button id="syncSignOutBtn" class="secondary-btn" type="button">退出登录</button></div>
@@ -466,7 +443,7 @@
   };
 
   const openAccount = () => openPanel(
-    { icon:"☁", title:"账号与同步", desc:"不登录也可完整使用；登录后可跨设备继续。", local:false },
+    { icon:"☁", title:"账号与同步", desc:"不登录也可完整使用；邮箱登录后可跨设备继续。", local:false },
     root => { renderAccountPanel(root); }
   );
 
@@ -482,13 +459,11 @@
     if (!configured) return;
 
     const meta = readMeta();
-    const authPending = sessionStorage.getItem("toolbox:auth-pending") === "1" || new URLSearchParams(location.search).has("code");
-    if (!meta.enabled && !authPending) return;
+    if (!meta.enabled) return;
 
     try {
       await refreshSession();
-      sessionStorage.removeItem("toolbox:auth-pending");
-      if (activeSession && meta.enabled) scheduleSync();
+      if (activeSession) scheduleSync();
     } catch (error) {
       writeMeta({ lastError:error.message || "账号初始化失败" });
     }
