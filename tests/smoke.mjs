@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const files=["core.js","cloud-config.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
+const files=["core.js","cloud-public.js","cloud-config.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","tools-focus.js","tools-thinking.js","tasks.js","horizons.js","calibration.js"];
 const index=fs.readFileSync("index.html","utf8");
 for(const file of files){
   if(!fs.existsSync(file))throw new Error(`missing ${file}`);
@@ -17,6 +17,7 @@ const sync=fs.readFileSync("sync.js","utf8");
 const lifecycle=fs.readFileSync("account-lifecycle.js","utf8");
 const diagnostics=fs.readFileSync("cloud-diagnostics.js","utf8");
 const cloudConfig=fs.readFileSync("cloud-config.js","utf8");
+const cloudPublic=fs.readFileSync("cloud-public.js","utf8");
 const migrationPath="supabase/migrations/20260913103000_create_toolbox_sync.sql";
 const migration=fs.readFileSync(migrationPath,"utf8");
 const supabaseConfig=fs.readFileSync("supabase/config.toml","utf8");
@@ -60,14 +61,19 @@ if(!calibration.includes("不等于已经找到根因")||!calibration.includes("
 if(!calibration.includes("把事实写入回顾")||!calibration.includes("我的调整"))throw new Error("plan → actual → adjustment loop is incomplete");
 if(!calibration.includes("当时置信度 ≥70%")||!calibration.includes("保存回看"))throw new Error("decision calibration loop is incomplete");
 
-if(!cloudConfig.includes("publishableKey")||!cloudConfig.includes("oauthProviders"))throw new Error("cloud config should expose only browser configuration");
+if(!index.includes('src="./cloud-public.js"')||index.indexOf('src="./cloud-public.js"')>index.indexOf('src="./cloud-config.js"'))throw new Error("public deployment config must load before cloud config");
+if(!cloudPublic.includes("publishableKey")||!cloudPublic.includes("emailOtp")||!cloudPublic.includes("wechatProvider"))throw new Error("public auth deployment config is incomplete");
+if(/sb_secret_|service_role/.test(cloudPublic))throw new Error("public deployment config must never contain privileged credentials");
+if(!cloudConfig.includes("ToolboxPublicCloudConfig")||!cloudConfig.includes("debugMode")||!cloudConfig.includes("emailOtp")||!cloudConfig.includes("wechatProvider"))throw new Error("cloud config must separate product deployment from debug setup");
 for(const token of ["flowType: \"pkce\"","toolbox:data-changed","lastSyncedHash","lastSyncedRevision","SYNC_CONFLICT","开始同步","本机和云端"]){
   if(!sync.includes(token))throw new Error(`sync layer missing token: ${token}`);
 }
-if(!sync.includes("登录前不会上传")||!sync.includes("enabled:false"))throw new Error("cloud upload must require explicit opt-in");
-for(const token of ["检查云端连接","toolbox_sync","delete-account","confirmation_required","不会上传、覆盖或删除任何数据"]){
-  if(!diagnostics.includes(token))throw new Error(`cloud diagnostics missing token: ${token}`);
+for(const token of ["当前：直接使用","不登录也能完整使用","signInWithOtp","verifyOtp","邮箱登录","微信登录"]){
+  if(!sync.includes(token))throw new Error(`guest-first auth missing token: ${token}`);
 }
+if(sync.includes("使用 GitHub 登录"))throw new Error("GitHub login should not be a primary consumer auth option");
+if(!sync.includes("enabled:false")||!sync.includes("不会先上传本机数据"))throw new Error("cloud upload must remain explicit after login");
+if(!diagnostics.includes("if (!config.debugMode) return")||!diagnostics.includes("开发者连接自检"))throw new Error("Supabase setup must remain developer-only");
 
 if(fs.existsSync("supabase/schema.sql"))throw new Error("database schema must live in versioned migrations, not a second schema.sql source");
 if(!fs.existsSync(migrationPath))throw new Error("cloud migration is missing");
@@ -82,4 +88,4 @@ if(/SUPABASE_SECRET_KEYS|sb_secret_|service_role/.test(deleteAccount))throw new 
 if(!deleteAccountDeno.includes('"@supabase/server": "npm:@supabase/server"'))throw new Error("Edge Function dependency map is missing");
 if(!gitignore.includes("supabase/functions/.env")||!gitignore.includes("supabase/.temp/"))throw new Error("local Supabase secrets/state must be ignored");
 
-console.log(`ok: ${ids.length} methods, optional local-first system, calibration, opt-in sync, diagnostics, migrations and account deletion enabled`);
+console.log(`ok: ${ids.length} methods, guest-first auth, optional sync, calibration, migrations and account lifecycle enabled`);
