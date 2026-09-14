@@ -1,4 +1,4 @@
-const CACHE_NAME = "toolbox-shell-v3";
+const CACHE_NAME = "toolbox-shell-v4";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -12,6 +12,7 @@ const APP_SHELL = [
   "./core.js",
   "./cloud-public.js",
   "./cloud-config.js",
+  "./sync-policy.js",
   "./sync.js",
   "./account-lifecycle.js",
   "./cloud-diagnostics.js",
