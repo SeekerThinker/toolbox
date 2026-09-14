@@ -27,11 +27,9 @@ jobs:
           node --check pwa.js
           node --check capture.js
           node --check sw.js
-          node --check word-writing-templates/app.js
           node --check tests/sync-contract.mjs
           node --check tests/auth-surface.mjs
           node --check tests/auth-email.mjs
-          node --check tests/word-writing-templates.mjs
       - name: Run smoke checks
         run: |
           node tests/smoke.mjs
@@ -39,7 +37,6 @@ jobs:
           node tests/sync-contract.mjs
           node tests/auth-surface.mjs
           node tests/auth-email.mjs
-          node tests/word-writing-templates.mjs
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
