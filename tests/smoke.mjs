@@ -70,9 +70,10 @@ if(!calibration.includes("当时置信度 ≥70%")||!calibration.includes("保�
 
 if(!index.includes('src="./cloud-public.js"')||index.indexOf('src="./cloud-public.js"')>index.indexOf('src="./cloud-config.js"'))throw new Error("public deployment config must load before cloud config");
 if(index.indexOf('src="./sync-policy.js"')<0||index.indexOf('src="./sync-policy.js"')>index.indexOf('src="./sync.js"'))throw new Error("shared sync policy must load before sync I/O");
-if(!cloudPublic.includes("publishableKey")||!cloudPublic.includes("emailOtp")||!cloudPublic.includes("wechatProvider"))throw new Error("public auth deployment config is incomplete");
+if(!cloudPublic.includes("publishableKey")||!cloudPublic.includes("emailOtp"))throw new Error("public email auth deployment config is incomplete");
+if(/wechatProvider|phoneOtp|sms/i.test(cloudPublic))throw new Error("public auth deployment config must stay email-only");
 if(/sb_secret_|service_role/.test(cloudPublic))throw new Error("public deployment config must never contain privileged credentials");
-if(!cloudConfig.includes("ToolboxPublicCloudConfig")||!cloudConfig.includes("debugMode")||!cloudConfig.includes("emailOtp")||!cloudConfig.includes("wechatProvider"))throw new Error("cloud config must separate product deployment from debug setup");
+if(!cloudConfig.includes("ToolboxPublicCloudConfig")||!cloudConfig.includes("debugMode")||!cloudConfig.includes("emailOtp"))throw new Error("cloud config must separate product deployment from debug setup");
 for(const token of ["UPLOAD_NEW","CONFLICT_FIRST","CONFLICT_REMOTE_NEWER","UPLOAD_LOCAL","CONFLICT_BOTH"]){
   if(!syncPolicy.includes(token))throw new Error(`sync policy missing action: ${token}`);
 }
@@ -80,10 +81,10 @@ if(!sync.includes("syncPolicy.decide")||!sync.includes("syncPolicy.ACTIONS"))thr
 for(const token of ["flowType: \"pkce\"","toolbox:data-changed","lastSyncedHash","lastSyncedRevision","SYNC_CONFLICT","开始同步","本机和云端"]){
   if(!sync.includes(token))throw new Error(`sync layer missing token: ${token}`);
 }
-for(const token of ["当前：直接使用","不登录也能完整使用","signInWithOtp","verifyOtp","邮箱登录","微信登录"]){
-  if(!sync.includes(token))throw new Error(`guest-first auth missing token: ${token}`);
+for(const token of ["当前：直接使用","不登录也能完整使用","signInWithOtp","verifyOtp","邮箱登录"]){
+  if(!sync.includes(token))throw new Error(`guest-first email auth missing token: ${token}`);
 }
-if(sync.includes("使用 GitHub 登录"))throw new Error("GitHub login should not be a primary consumer auth option");
+if(/微信|wechat|使用 GitHub 登录|signInWithOAuth|type:\s*"sms"/i.test(sync))throw new Error("consumer auth must remain guest plus email only");
 if(!sync.includes("enabled:false")||!sync.includes("不会先上传本机数据"))throw new Error("cloud upload must remain explicit after login");
 if(!diagnostics.includes("if (!config.debugMode) return")||!diagnostics.includes("开发者连接自检"))throw new Error("Supabase setup must remain developer-only");
 
@@ -100,4 +101,4 @@ if(/SUPABASE_SECRET_KEYS|sb_secret_|service_role/.test(deleteAccount))throw new 
 if(!deleteAccountDeno.includes('"@supabase/server": "npm:@supabase/server"'))throw new Error("Edge Function dependency map is missing");
 if(!gitignore.includes("supabase/functions/.env")||!gitignore.includes("supabase/.temp/"))throw new Error("local Supabase secrets/state must be ignored");
 
-console.log(`ok: ${ids.length} methods, guest-first auth, shared sync policy, calibration, aligned migrations and account lifecycle enabled`);
+console.log(`ok: ${ids.length} methods, guest-plus-email auth, shared sync policy, calibration, aligned migrations and account lifecycle enabled`);
