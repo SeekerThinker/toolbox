@@ -30,9 +30,9 @@ for (const filename of [
 must(app.includes('Word-Writing-Templates-Windows.zip'), 'stable Windows package link missing');
 must(app.includes('Word-Writing-Templates-macOS.zip'), 'stable macOS package link missing');
 must(!app.includes('/structured/'), 'v4 selector must not expose historical structured paths');
-must(app.includes('v4 只有一套模板'), 'unified v4 product message missing');
 must(app.includes('导航窗格'), 'thinking-first Navigation Pane guidance missing');
-must(app.includes('word_quick_success.yml') && app.includes('word_compatibility_report.yml'), 'real Word feedback links missing');
+must(app.includes('作者、摘要、目录、页码、参考文献等常用结构已经预置'), 'optional manuscript structure guidance missing');
+must(!app.includes('word_quick_success.yml') && !app.includes('word_compatibility_report.yml'), 'selector should not solicit Word feedback');
 must(app.includes('url.searchParams.delete("variant")'), 'legacy two-variant query cleanup missing');
 
 console.log('Word template selector contract OK');
