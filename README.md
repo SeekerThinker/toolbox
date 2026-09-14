@@ -67,7 +67,7 @@ Toolbox 是一个轻量、开源、Local-first 的个人思考与执行系统。
 
 目标是可选的长期对象，可以打卡、关联任务、查看关联任务完成情况和实际专注投入。
 
-长期校准层会比较计划与实际，包括估时偏差、重复障碍、专注时间分布、Decision Journal 回看、周期事实和目标节奏。它只展示证据和趋势，不生成“生产力分数”。
+长期校准层会比较计划与实际，包括估时偏差、重复障碍、专注时间分布、Decision Journal 回看、周期事实和目标节奏。它只展示证据和趋势，不生成“生产力分数”。计划区不再另设一套重复“洞察”入口。
 
 ## PWA 与快速捕获
 
@@ -77,7 +77,9 @@ Toolbox 可以作为 PWA 安装到支持的手机和桌面环境，并支持离�
 
 - 从应用图标快捷进入“新建待办”
 - 从其他 App 分享文字或链接到 Toolbox
-- 分享内容只会带入待办草稿，不会自动创建，避免误操作
+- 分享内容通过 Service Worker 的本地临时收件箱带入草稿，不放进 URL，也不会自动创建任务
+
+Web App shortcuts / Share Target 的支持取决于浏览器和操作系统；不支持时普通网页与 PWA 核心功能仍可使用。
 
 ## 数据与游客版
 
@@ -85,7 +87,7 @@ Toolbox 可以作为 PWA 安装到支持的手机和桌面环境，并支持离�
 
 - 所有核心数据保存在当前浏览器本地
 - 不登录、不注册即可完整使用任务、思考、专注、计划、目标和校准
-- 支持完整 JSON 导出与导入，可手动备份或迁移设备
+- 顶部“备份”可导出完整 JSON，也可以导入备份迁移设备
 - PWA 离线后仍可打开核心工作台
 - 本地数据不会因为未来增加账号能力而自动上传
 
@@ -101,12 +103,13 @@ core.js                          # 存储、方法注册、任务上下文、导
 tasks.js                         # 捕获、待办、任务详情、历史与复盘
 tools-thinking.js                # 思考方法
 tools-focus.js                   # 番茄钟与深度工作
-horizons.js                      # 日 / 周 / 月 / 年方向、目标与洞察
+horizons.js                      # 日 / 周 / 月 / 年方向与目标
 calibration.js                   # 长期校准
+readability.css                  # 可读性与移动触控尺寸修正
 sync-policy.js                   # 预留的多端同步冲突决策
 sync.js                          # 预留的邮箱账号与云端 I/O
 account-lifecycle.js             # 预留的账号删除生命周期
-pwa.js / capture.js              # PWA 安装与移动捕获
+pwa.js / capture.js / sw.js      # PWA 安装、离线与移动捕获
 supabase/migrations/             # 预留的数据库结构、RLS、并发控制
 supabase/functions/delete-account/ # 预留的账号删除 Edge Function
 tests/                           # 产品模型、PWA、游客版表面和同步契约测试
@@ -127,20 +130,12 @@ supabase start
 supabase db reset
 ```
 
-## 相关独立项目：Word 结构化思考与写作模板
-
-Toolbox 会索引一个独立维护的 Word 写作项目：[`word-writing-templates`](https://github.com/SeekerThinker/word-writing-templates)。它把 Word 的标题层级和导航窗格当成结构化思考工具，让同一份文档从想法、大纲、正文一直成长到最终成稿。
-
-在线选择器：**https://seekerthinker.github.io/toolbox/word-writing-templates/**
-
-这里刻意保持边界：Toolbox 只负责发现与选择，不复制模板源码或二进制文件；模板生成、Release、Issues、兼容性记录和真实 Word 反馈都留在独立仓库。
-
 ## 当前方向
 
 当前阶段先把游客版作为完整产品使用，不继续扩展账号体系。优先关注：
 
 1. 真实使用中任务捕获、思考、专注、计划和复盘是否顺畅
-2. 移动端快速捕获与 PWA 离线体验
+2. 移动端快速捕获、离线使用与备份恢复是否可靠
 3. 目标、任务和时间视野之间的关联是否自然
 4. 随真实样本积累，逐步增强估时和判断校准
 5. 邮箱登录与多端同步留待确有需求时再开放
