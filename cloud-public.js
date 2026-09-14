@@ -6,6 +6,7 @@
   window.ToolboxPublicCloudConfig = Object.freeze({
     publishableKey: "",
     emailOtp: true,
-    wechatProvider: ""
+    wechatProvider: "",
+    accountDeletionEnabled: false
   });
 })();
