@@ -1,4 +1,4 @@
-const CACHE_NAME = "toolbox-shell-v2";
+const CACHE_NAME = "toolbox-shell-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -10,6 +10,8 @@ const APP_SHELL = [
   "./pwa-icon-192.svg",
   "./pwa-icon-512.svg",
   "./core.js",
+  "./cloud-public.js",
+  "./cloud-config.js",
   "./sync.js",
   "./account-lifecycle.js",
   "./cloud-diagnostics.js",
@@ -55,7 +57,11 @@ self.addEventListener("fetch", event => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
 
-  if (request.mode === "navigate" || url.pathname.endsWith("/cloud-config.js")) {
+  if (
+    request.mode === "navigate" ||
+    url.pathname.endsWith("/cloud-public.js") ||
+    url.pathname.endsWith("/cloud-config.js")
+  ) {
     event.respondWith(networkFirst(request));
     return;
   }
