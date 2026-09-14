@@ -10,6 +10,8 @@ assert.match(publicConfig, /emailOtp:\s*false/, "public email OTP must stay hidd
 assert.match(publicConfig, /wechatProvider:\s*""/, "WeChat must stay hidden until a provider is configured");
 assert.match(publicConfig, /accountDeletionEnabled:\s*true/, "account deletion is enabled because the Edge Function is deployed");
 
+assert.match(syncSource, /const emailOtpEnabled = config\.emailOtp === true;/, "email OTP must require explicit product enablement");
+assert.doesNotMatch(syncSource, /config\.emailOtp !== false/, "email OTP must never default open when config is missing");
 assert.match(syncSource, /不登录也能完整使用 Toolbox/, "guest-first message must remain explicit");
 assert.match(syncSource, /登录只用于跨设备同步，不会先上传本机数据/, "login must not imply upload");
 assert.match(syncSource, /wechatProvider\s*\?/, "WeChat button must be conditional");
