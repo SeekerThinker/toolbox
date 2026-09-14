@@ -1,4 +1,4 @@
-const CACHE_NAME = "toolbox-shell-v6";
+const CACHE_NAME = "toolbox-shell-v7";
 const SHARE_CACHE = "toolbox-share-inbox-v1";
 const SHARE_ENTRY = new URL("./__share_payload__", self.registration.scope).href;
 const APP_SHELL = [
@@ -7,18 +7,11 @@ const APP_SHELL = [
   "./styles.css",
   "./horizons.css",
   "./calibration.css",
-  "./cloud.css",
   "./readability.css",
   "./manifest.webmanifest",
   "./pwa-icon-192.svg",
   "./pwa-icon-512.svg",
   "./core.js",
-  "./cloud-public.js",
-  "./cloud-config.js",
-  "./sync-policy.js",
-  "./sync.js",
-  "./account-lifecycle.js",
-  "./cloud-diagnostics.js",
   "./tools-focus.js",
   "./tools-thinking.js",
   "./tasks.js",
@@ -87,11 +80,7 @@ self.addEventListener("fetch", event => {
 
   if (request.method !== "GET") return;
 
-  if (
-    request.mode === "navigate" ||
-    url.pathname.endsWith("/cloud-public.js") ||
-    url.pathname.endsWith("/cloud-config.js")
-  ) {
+  if (request.mode === "navigate") {
     event.respondWith(networkFirst(request));
     return;
   }
