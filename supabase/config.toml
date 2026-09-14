@@ -9,5 +9,9 @@ additional_redirect_urls = [
   "https://seekerthinker.github.io/toolbox/**"
 ]
 
+[auth.email.template.magic_link]
+subject = "Toolbox 登录验证码"
+content_path = "./supabase/templates/magic_link.html"
+
 [functions.delete-account]
 verify_jwt = true
