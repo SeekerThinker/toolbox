@@ -1,4 +1,6 @@
-const CACHE_NAME = "toolbox-shell-v4";
+const CACHE_NAME = "toolbox-shell-v5";
+const SHARE_CACHE = "toolbox-share-inbox-v1";
+const SHARE_ENTRY = new URL("./__share_payload__", self.registration.scope).href;
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -32,7 +34,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))))
+      .then(keys => Promise.all(keys.filter(key => key !== CACHE_NAME && key !== SHARE_CACHE).map(key => caches.delete(key))))
       .then(() => self.clients.claim())
   );
 });
@@ -53,10 +55,36 @@ const networkFirst = async request => {
   }
 };
 
+const cleanShared = value => String(value || "").replace(/\s+/g, " ").trim();
+
+const receiveShare = async request => {
+  const form = await request.formData();
+  const values = [form.get("title"), form.get("text"), form.get("url")]
+    .map(cleanShared)
+    .filter(Boolean);
+  const unique = values.filter((value, index) =>
+    !values.some((other, otherIndex) => otherIndex < index && (other.includes(value) || value.includes(other)))
+  );
+  const shared = unique.join(" — ").slice(0, 3000);
+  const inbox = await caches.open(SHARE_CACHE);
+  if (shared) {
+    await inbox.put(SHARE_ENTRY, new Response(shared, { headers: { "Content-Type": "text/plain; charset=utf-8" } }));
+  } else {
+    await inbox.delete(SHARE_ENTRY);
+  }
+  return Response.redirect(new URL("./?capture=shared", self.registration.scope).href, 303);
+};
+
 self.addEventListener("fetch", event => {
   const { request } = event;
-  if (request.method !== "GET") return;
   const url = new URL(request.url);
+
+  if (request.method === "POST" && url.origin === self.location.origin && url.pathname.endsWith("/share-target")) {
+    event.respondWith(receiveShare(request));
+    return;
+  }
+
+  if (request.method !== "GET") return;
 
   if (
     request.mode === "navigate" ||
