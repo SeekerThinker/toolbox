@@ -7,10 +7,11 @@
   const AUTH_KEY = "toolbox:supabase:auth:v1";
   const config = window.ToolboxCloudConfig || {};
   const configured = config.provider === "supabase" && /^https:\/\//.test(config.url || "") && /^sb_publishable_/.test(config.publishableKey || "");
+  const enabled = configured && config.accountDeletionEnabled === true;
   let clientPromise = null;
 
   const getClient = async () => {
-    if (!configured) throw new Error("云同步尚未配置");
+    if (!enabled) throw new Error("账号删除服务尚未启用");
     if (!clientPromise) {
       clientPromise = import(SDK_URL).then(({ createClient }) => createClient(config.url, config.publishableKey, {
         auth: {
@@ -32,7 +33,7 @@
   };
 
   const injectDeleteAccount = root => {
-    if (!configured || !root || $("#syncDeleteAccountBtn", root)) return;
+    if (!enabled || !root || $("#syncDeleteAccountBtn", root)) return;
     const cloudDelete = $("#syncDeleteCloudBtn", root);
     if (!cloudDelete) return;
     const body = cloudDelete.closest(".task-capability-body");
@@ -71,6 +72,7 @@
   };
 
   const start = () => {
+    if (!enabled) return;
     const dialog = $("#toolDialog");
     if (!dialog) return;
     const observer = new MutationObserver(() => injectDeleteAccount(dialog));
