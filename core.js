@@ -78,6 +78,7 @@
   if (!Array.isArray(data.tasks.activities)) data.tasks.activities = [];
   if (migrateLegacy(data) || !localStorage.getItem(STORAGE_KEY)) localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 
+  const isRecord = value => value !== null && typeof value === "object" && !Array.isArray(value);
   const storage = {
     get(path, fallback=null) {
       const value = getPath(data,path,fallback);
@@ -96,18 +97,24 @@
     exportData() { return JSON.stringify(data,null,2); },
     importData(text) {
       const incoming = typeof text === "string" ? JSON.parse(text) : text;
-      if (!incoming || typeof incoming !== "object" || Array.isArray(incoming)) throw new Error("数据格式无效");
-      const incomingTasks = incoming.tasks && typeof incoming.tasks === "object" ? incoming.tasks : {};
-      data = {
+      if (!isRecord(incoming) || incoming.version !== DATA_VERSION ||
+          !isRecord(incoming.tasks) || !Array.isArray(incoming.tasks.items) ||
+          !Array.isArray(incoming.tasks.activities) || !isRecord(incoming.tools) ||
+          !isRecord(incoming.preferences) || !Array.isArray(incoming.favorites) ||
+          !Array.isArray(incoming.recent)) {
+        throw new Error("不是有效的 Toolbox v1 备份，当前数据未更改");
+      }
+      const nextData = {
         ...defaultData(), ...incoming,
         version:DATA_VERSION,
-        preferences:{...defaultData().preferences,...(incoming.preferences||{})},
-        favorites:Array.isArray(incoming.favorites)?incoming.favorites:[],
-        recent:Array.isArray(incoming.recent)?incoming.recent:[],
-        tasks:{items:Array.isArray(incomingTasks.items)?incomingTasks.items:[],activities:Array.isArray(incomingTasks.activities)?incomingTasks.activities:[]},
-        tools:incoming.tools&&typeof incoming.tools==="object"?incoming.tools:{}
+        preferences:{...defaultData().preferences,...incoming.preferences},
+        favorites:incoming.favorites,
+        recent:incoming.recent,
+        tasks:{items:incoming.tasks.items,activities:incoming.tasks.activities},
+        tools:incoming.tools
       };
-      localStorage.setItem(STORAGE_KEY,JSON.stringify(data));
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(nextData));
+      data = nextData;
       return storage.snapshot();
     }
   };
