@@ -35,7 +35,7 @@ for (const token of ['params.get("capture")', 'mode !== "shared"', 'toolbox-shar
 }
 if (/params\.get\("(?:title|text|url)"\)|\.click\(\)|storage\.set|addTask/i.test(capture)) throw new Error("shared content must not travel in URL params or auto-create a task");
 
-for (const token of ["toolbox-shell-v7", "toolbox-share-inbox-v1", 'request.method === "POST"', 'url.pathname.endsWith("/share-target")', "request.formData()", "SHARE_ENTRY", '"./readability.css"', '"./capture.js"']) {
+for (const token of ["toolbox-shell-v8", "toolbox-share-inbox-v1", 'request.method === "POST"', 'url.pathname.endsWith("/share-target")', "request.formData()", "SHARE_ENTRY", '"./readability.css"', '"./capture.js"']) {
   if (!sw.includes(token)) throw new Error(`service worker missing token: ${token}`);
 }
 for (const dormant of ["cloud-public.js","cloud-config.js","sync-policy.js","sync.js","account-lifecycle.js","cloud-diagnostics.js","cloud.css"]) {
