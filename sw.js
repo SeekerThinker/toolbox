@@ -1,4 +1,4 @@
-const CACHE_NAME = "toolbox-shell-v7";
+const CACHE_NAME = "toolbox-shell-v8";
 const SHARE_CACHE = "toolbox-share-inbox-v1";
 const SHARE_ENTRY = new URL("./__share_payload__", self.registration.scope).href;
 const APP_SHELL = [
