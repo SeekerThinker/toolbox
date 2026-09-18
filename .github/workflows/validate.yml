@@ -33,6 +33,7 @@ jobs:
           node --check tests/product-scope.mjs
           node --check tests/usability-safety.mjs
           node --check tests/repository-context.mjs
+          node --check tests/backup-restore.mjs
       - name: Run smoke checks
         run: |
           node tests/smoke.mjs
@@ -43,6 +44,7 @@ jobs:
           node tests/product-scope.mjs
           node tests/usability-safety.mjs
           node tests/repository-context.mjs
+          node tests/backup-restore.mjs
       - name: Set up Deno
         uses: denoland/setup-deno@v2
         with:
